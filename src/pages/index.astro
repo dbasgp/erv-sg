@@ -20,8 +20,8 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
     </div>
     <HeroAir />
     <div class="hero-text">
-      <h1 id="hero-h">Dry, filtered air at the ceiling. In a climate that fights you</h1>
-      <p class="lede">Condensers above the slab. Ducts in the ceiling void. Supply grilles in the room. The unit is never seen; the humidity is never felt.</p>
+      <h1 id="hero-h">Fresh air for your home, without Singapore's humidity</h1>
+      <p class="lede">A unit hidden above the false ceiling brings in filtered outdoor air, takes the moisture out, and delivers it to each room through a small grille. Windows stay shut, rooms stay dry and don't get stuffy.</p>
       <div class="actions">
         <a class="btn" href="/contact/#quote">Request a quote</a>
         <a class="btn btn--quiet" href="/how-it-works/">How it works</a>
@@ -33,22 +33,20 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
   <section class="section wrap">
     <div class="secthead">
       <div>
-        <p class="eyebrow">Note 01 · the climate problem</p>
-        <h2>Ventilation imports humidity. Dehumidifiers leave the air stale. You need both, handled together</h2>
+        <h2>Open the window and the room gets damp. Close it and the air gets stuffy</h2>
       </div>
-      <span class="ref">p. 01</span>
     </div>
     <div class="problem">
       <div class="prob prob--a">
-        <p class="label-mono">A · ventilation only</p>
+        <p class="label-mono">Fresh air only</p>
         <p>Outdoor air here is warm and wet all year. Bring it in untreated and the room gets damper; the aircon works harder; the bill goes up.</p>
       </div>
       <div class="prob prob--b">
-        <p class="label-mono">B · dehumidifier only</p>
+        <p class="label-mono">Dehumidifier only</p>
         <p>A dehumidifier dries the air that's already in the room. In a sealed bedroom, that same air gets stale. CO₂ climbs. Sleep suffers.</p>
       </div>
       <div class="prob prob--c">
-        <p class="label-mono">C · both, above the ceiling</p>
+        <p class="label-mono">Both together, above the ceiling</p>
         <p>Pull filtered outdoor air in, recover cooling from the air going out, dry what comes in. Deliver it through the ceiling grille. No window needed.</p>
       </div>
     </div>
@@ -59,7 +57,7 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
     <div class="secthead">
       <div>
         <p class="eyebrow">Product families</p>
-        <h2>Three unit types. Pick by what the room needs</h2>
+        <h2>Three types of unit, depending on what the room needs</h2>
       </div>
       <span class="ref">fig 01–03</span>
     </div>
@@ -99,18 +97,14 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
   <section class="section wrap">
     <div class="secthead">
       <div>
-        <p class="eyebrow">Applications</p>
-        <h2>Where they go in</h2>
+        <h2>Where they're used</h2>
       </div>
-      <span class="ref">index</span>
     </div>
     <ul class="register apps-reg">
       {apps.map((a) => (
         <li>
           <a href={`/applications/${a.id}/`}>
-            <span class="num">{(a.data.order ?? 0).toString().padStart(2,'0')}</span>
             <span class="title">{a.data.title}</span>
-            <span class="meta">see brief</span>
           </a>
         </li>
       ))}
@@ -162,7 +156,7 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
     <div class="cta-grid">
       <div>
         <p class="eyebrow label-mono">Next step</p>
-        <h2>Send a floor plan. We size the system and send the datasheets</h2>
+        <h2>Send us your floor plan and we'll suggest what to install</h2>
       </div>
       <div class="cta-actions">
         <a class="btn" href="/contact/#quote">Request a quote</a>
@@ -192,9 +186,7 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
     .prob + .prob { border-left: 1px solid var(--line); }
   }
   .prob p { max-width: 36ch; }
-  .prob .label-mono { color: var(--ink); margin-bottom: var(--space-3); }
-  .prob--c .label-mono { color: var(--dry); }
-  .prob--a .label-mono { color: var(--wet); }
+  .prob .label-mono { font-family: var(--font-sans); font-size: 1rem; font-weight: 600; letter-spacing: 0; color: var(--ink); margin-bottom: var(--space-3); }
 
   /* FAMILIES: asymmetric bands, alternating flip on the middle one */
   .families { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
@@ -219,6 +211,7 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
 
   /* Apps register uses global .register */
   .apps-reg { border-top-color: var(--rule); border-top-width: 2px; }
+  .apps-reg a { grid-template-columns: 1fr; }
 
   /* Specifier split */
   .spec-grid { display: grid; gap: var(--space-6); }

@@ -24,10 +24,7 @@ const path = `/projects/${project.id}/`;
   <article>
     <!-- Case-study header block -->
     <header class="wrap submittal">
-      <div class="sheet-meta">
-        <span class="label-mono">Project · case study</span>
-        <span class="label-mono">{d.locationType}</span>
-      </div>
+      <p class="loc-type">{d.locationType}</p>
       {d.draft && <p><span class="draft-flag">DRAFT · not built for production</span></p>}
       <h1>{d.title}</h1>
       <p class="lede">{d.description}</p>
@@ -54,8 +51,7 @@ const path = `/projects/${project.id}/`;
     {d.families.length > 0 && (
       <section class="section wrap">
         <div class="secthead">
-          <div><p class="eyebrow">Equipment used</p><h2>What went in</h2></div>
-          <span class="ref">spec</span>
+          <div><h2>What we installed</h2></div>
         </div>
         <ul class="eq-reg">
           {d.families.map((f, i) => {
@@ -76,8 +72,7 @@ const path = `/projects/${project.id}/`;
     {d.photos.length > 0 && (
       <section class="section wrap">
         <div class="secthead">
-          <div><p class="eyebrow">Photos</p><h2>On site</h2></div>
-          <span class="ref">PL 01–{String(d.photos.length).padStart(2,'0')}</span>
+          <div><h2>Photos from the site</h2></div>
         </div>
         <div class="photos">
           {d.photos.map((ph, i) => {
@@ -85,7 +80,7 @@ const path = `/projects/${project.id}/`;
             return img && (
               <figure>
                 <Image src={img} alt={ph.alt} widths={[400, 800]} sizes="(min-width: 48rem) 50vw, 100vw" />
-                <figcaption><span class="fig">PL {String(i+1).padStart(2,'0')}</span>{ph.alt}</figcaption>
+                <figcaption>{ph.alt}</figcaption>
               </figure>
             );
           })}
@@ -100,7 +95,7 @@ const path = `/projects/${project.id}/`;
 </Base>
 <style>
   .submittal { padding-block: var(--space-6) var(--space-5); border-bottom: 2px solid var(--rule); }
-  .sheet-meta { display: flex; justify-content: space-between; gap: var(--space-4); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); margin-bottom: var(--space-5); }
+  .loc-type { margin: 0 0 var(--space-3); font-family: var(--font-sans); font-size: 0.9rem; color: var(--ink-2); }
   .submittal h1 { max-width: 22ch; margin-bottom: var(--space-4); }
   .submittal .lede { margin-bottom: 0; }
 

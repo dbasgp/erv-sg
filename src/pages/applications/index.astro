@@ -9,7 +9,7 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
   crumbs={[{ name: 'Home', href: '/' }, { name: 'Applications', href: '/applications/' }]}
 >
   <header class="wrap page-head">
-    <h1>Where it goes in</h1>
+    <h1>Where it's used</h1>
     <p class="lede">A sealed bedroom and an open clinic have different humidity and fresh-air problems, even in the same climate. Pick the space closest to your project.</p>
   </header>
 
@@ -18,7 +18,6 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
       {apps.map((a) => (
         <li>
           <a href={`/applications/${a.id}/`}>
-            <span class="num">{String(a.data.order ?? 0).padStart(2,'0')}</span>
             <span class="title">{a.data.title}</span>
             <span class="meta">{a.data.description}</span>
           </a>
@@ -29,6 +28,6 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
 </Base>
 <style>
   .apps-reg { border-top-color: var(--rule); border-top-width: 2px; }
-  .apps-reg a { grid-template-columns: 3rem 16rem 1fr; }
-  @media (max-width: 42rem) { .apps-reg a { grid-template-columns: 2rem 1fr; } .apps-reg .meta { grid-column: 2; font-family: var(--font-serif); } }
+  .apps-reg a { grid-template-columns: 16rem 1fr; }
+  @media (max-width: 42rem) { .apps-reg a { grid-template-columns: 1fr; gap: var(--space-2); } .apps-reg .meta { grid-column: 1; font-family: var(--font-serif); } }
 </style>

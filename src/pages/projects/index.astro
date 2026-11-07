@@ -18,7 +18,6 @@ const projects = (await getCollection('projects', (p) => import.meta.env.DEV || 
   <section class="wrap">
     {projects.length === 0
       ? <div class="empty">
-          <p class="label-mono">INDEX · EMPTY</p>
           <p>Case studies are being written up. Meanwhile, <a href="/contact/">ask about a project similar to yours</a> and we'll share what's relevant.</p>
         </div>
       : (
