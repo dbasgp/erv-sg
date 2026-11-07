@@ -37,33 +37,33 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
    <!-- slab under outdoor -->
    <rect x="0" y="96" width="360" height="12" class="slab"/>
 
-   <!-- intake pipe into unit -->
-   <rect x="20" y="118" width="80" height="18" class="duct"/>
-   <text x="20" y="112" class="anno small-anno">INTAKE · Ø160</text>
+   <!-- intake pipe into unit (label sits clear of slab and duct) -->
+   <text x="20" y="128" class="anno small-anno">INTAKE Ø160</text>
+   <rect x="20" y="136" width="80" height="18" class="duct"/>
+
+   <!-- exhaust out, below the intake -->
+   <rect x="20" y="184" width="80" height="18" class="duct duct--return"/>
+   <text x="20" y="176" class="anno small-anno">EXHAUST</text>
 
    <!-- UNIT -->
-   <rect x="100" y="156" width="240" height="68" class="unit"/>
-   <text x="112" y="174" class="anno unit-label">ERV + FRESH-AIR DEHU</text>
-   <text x="112" y="190" class="anno small-anno">DBA-UTC22</text>
-   <text x="112" y="206" class="anno small-anno">R290</text>
-   <path d="M196 204 L220 184 L244 204 L220 216 Z" class="core"/>
-   <circle cx="310" cy="198" r="10" class="fan"/>
+   <rect x="100" y="128" width="240" height="84" class="unit"/>
+   <text x="112" y="148" class="anno unit-label">ERV + FRESH-AIR DEHU</text>
+   <text x="112" y="166" class="anno small-anno">DBA-UTC22</text>
+   <text x="112" y="182" class="anno small-anno">R290</text>
+   <path d="M232 194 L256 178 L280 194 L256 206 Z" class="core"/>
+   <circle cx="314" cy="192" r="10" class="fan"/>
 
    <!-- supply duct down -->
-   <rect x="220" y="224" width="30" height="48" class="duct drop"/>
+   <rect x="220" y="212" width="30" height="63" class="duct drop"/>
    <!-- return rise -->
-   <rect x="120" y="224" width="22" height="48" class="duct duct--return drop"/>
-   <!-- exhaust out -->
-   <rect x="20" y="146" width="80" height="18" class="duct duct--return"/>
-   <text x="20" y="140" class="anno small-anno">EXHAUST</text>
+   <rect x="160" y="212" width="22" height="63" class="duct duct--return drop"/>
+   <text x="262" y="262" class="anno small-anno">VOID 450</text>
 
    <!-- ceiling line -->
    <line x1="0" y1="275" x2="360" y2="275" class="ceiling"/>
-   <text x="12" y="294" class="anno small-anno">CEILING VOID / 450</text>
-
    <!-- supply grille -->
    <line x1="220" y1="275" x2="250" y2="275" class="grille"/>
-   <line x1="120" y1="275" x2="142" y2="275" class="grille grille--return"/>
+   <line x1="160" y1="275" x2="182" y2="275" class="grille grille--return"/>
 
    <!-- ROOM -->
    <rect x="0" y="508" width="360" height="12" class="slab"/>
@@ -77,16 +77,16 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
 
    <!-- airflow lanes -->
    <g class="lane-in-m">
-     {Array.from({ length: 5 }, (_, i) => <circle cx="26" cy="127" r="3.6" class="d-wet" style={`--i:${i}`} />)}
+     {Array.from({ length: 5 }, (_, i) => <circle cx="24" cy="145" r="3.6" class="d-wet" style={`--i:${i}`} />)}
    </g>
    <g class="lane-drop-m">
-     {Array.from({ length: 5 }, (_, i) => <circle cx="235" cy="232" r="3.6" class="d-dry" style={`--i:${i}`} />)}
+     {Array.from({ length: 5 }, (_, i) => <circle cx="235" cy="220" r="3.6" class="d-dry" style={`--i:${i}`} />)}
    </g>
    <g class="lane-ret-m">
-     {Array.from({ length: 4 }, (_, i) => <circle cx="131" cy="265" r="3" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+     {Array.from({ length: 4 }, (_, i) => <circle cx="171" cy="268" r="3" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
    </g>
    <g class="lane-exh-m">
-     {Array.from({ length: 4 }, (_, i) => <circle cx="110" cy="155" r="3" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+     {Array.from({ length: 4 }, (_, i) => <circle cx="96" cy="193" r="3" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
    </g>
 
    <!-- title block -->
@@ -97,7 +97,7 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
 
  <!-- Desktop: the wide annotated drawing -->
  <div class="scroll-wrap">
-  <svg class="hero-air__wide" viewBox="0 0 1000 440" role="img" aria-labelledby="ha-t ha-d" preserveAspectRatio="xMidYMid meet">
+  <svg class="hero-air__wide" viewBox="0 0 1000 472" role="img" aria-labelledby="ha-t ha-d" preserveAspectRatio="xMidYMid meet">
     <title id="ha-t">Section through a condo bedroom: ERV and fresh-air dehumidifier in the ceiling void</title>
     <desc id="ha-d">Warm humid outdoor air enters a ducted intake, passes through a filter and dehumidifier concealed above the false ceiling, and is delivered as dry supply air into the room through a ceiling grille. Return air is exhausted back outside.</desc>
 
@@ -117,118 +117,109 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
       </marker>
     </defs>
 
-    <rect x="0" y="0" width="1000" height="440" fill="url(#grid5)" class="grid"/>
+    <rect x="0" y="0" width="1000" height="472" fill="url(#grid5)" class="grid"/>
 
     <!-- outdoor zone (left) -->
     <rect x="0" y="0" width="200" height="440" class="zone-out"/>
+    <text x="26" y="34" class="anno big-anno">OUTDOOR</text>
+    <text x="26" y="50" class="anno small-anno">30°C · 85% RH</text>
 
     <!-- ambient vapour dots outside -->
     <g class="vapour">
       {vapour.map((i) => (
-        <circle cx={25 + (i*17)%160} cy={60 + (i*53)%320} r="2.6" class="d-wet" style={`--i:${i}`} />
+        <circle cx={25 + (i*17)%160} cy={80 + (i*53)%320} r="2.6" class="d-wet" style={`--i:${i}`} />
       ))}
     </g>
 
     <!-- structure: slab, wall, floor -->
     <rect x="200" y="0" width="800" height="36" class="slab"/>
-    <text x="206" y="22" class="anno small-anno">SLAB · 150 mm</text>
-
+    <text x="206" y="22" class="anno small-anno">SLAB 150</text>
     <rect x="200" y="404" width="800" height="36" class="slab"/>
     <text x="206" y="426" class="anno small-anno">FLOOR</text>
-
     <line x1="200" y1="0" x2="200" y2="440" class="wall"/>
     <line x1="996" y1="0" x2="996" y2="440" class="wall-thin"/>
 
-    <!-- ceiling plane -->
+    <!-- false ceiling void + ceiling plane -->
+    <rect x="200" y="36" width="796" height="114" class="void"/>
     <line x1="200" y1="150" x2="996" y2="150" class="ceiling"/>
 
-    <!-- false ceiling void shading -->
-    <rect x="200" y="36" width="800" height="114" class="void"/>
+    <!-- intake through the wall (label above the duct) -->
+    <text x="210" y="51" class="anno small-anno">INTAKE Ø160</text>
+    <rect x="200" y="58" width="180" height="36" class="duct"/>
 
-    <!-- intake penetration through the wall -->
-    <rect x="200" y="56" width="180" height="40" class="duct"/>
-    <text x="210" y="80" class="anno">INTAKE · Ø160</text>
+    <!-- exhaust back out through the wall (label below the duct) -->
+    <rect x="200" y="104" width="180" height="22" class="duct duct--return"/>
+    <text x="210" y="142" class="anno small-anno">EXHAUST</text>
 
-    <!-- unit: fresh-air ERV / dehumidifier -->
-    <rect x="380" y="46" width="240" height="70" class="unit"/>
-    <text x="392" y="66" class="anno unit-label">ERV + FRESH-AIR DEHUMIDIFIER</text>
-    <text x="392" y="82" class="anno small-anno">DBA-UTC22 · R290</text>
-    <!-- coil ticks -->
+    <!-- unit: label band on top, components below a hairline -->
+    <rect x="380" y="42" width="240" height="100" class="unit"/>
+    <text x="392" y="60" class="anno unit-label">ERV + FRESH-AIR DEHUMIDIFIER</text>
+    <text x="392" y="76" class="anno small-anno">DBA-UTC22 · R290</text>
+    <line x1="380" y1="86" x2="620" y2="86" class="unit-rule"/>
     <g class="coil">
-      {[410, 420, 430, 440, 450].map((x) => <line x1={x} y1="52" x2={x} y2="110" />)}
+      {[402, 412, 422, 432, 442].map((x) => <line x1={x} y1="94" x2={x} y2="134" />)}
     </g>
-    <!-- enthalpy core rhombus -->
-    <path d="M480 82 L520 56 L560 82 L520 108 Z" class="core"/>
-    <!-- fan -->
-    <circle cx="595" cy="82" r="14" class="fan"/>
-    <path d="M595 82 L603 76 M595 82 L603 88 M595 82 L587 82" class="fan-blade"/>
+    <path d="M480 114 L520 92 L560 114 L520 136 Z" class="core"/>
+    <circle cx="592" cy="114" r="14" class="fan"/>
+    <path d="M592 114 L600 108 M592 114 L600 120 M592 114 L584 114" class="fan-blade"/>
 
-    <!-- supply duct -->
-    <rect x="620" y="60" width="200" height="30" class="duct"/>
-    <!-- return duct -->
-    <rect x="620" y="96" width="200" height="22" class="duct duct--return"/>
-    <!-- drops into room -->
-    <rect x="820" y="60" width="30" height="90" class="duct drop"/>
-    <!-- return rise -->
-    <rect x="890" y="96" width="24" height="54" class="duct duct--return drop"/>
-    <!-- exhaust out -->
-    <rect x="820" y="118" width="180" height="22" class="duct duct--return"/>
-    <text x="830" y="134" class="anno small-anno">EXHAUST</text>
+    <!-- supply duct and drop -->
+    <rect x="620" y="52" width="230" height="30" class="duct"/>
+    <rect x="820" y="82" width="30" height="68" class="duct drop"/>
+    <!-- return duct and rise -->
+    <rect x="620" y="104" width="92" height="22" class="duct duct--return"/>
+    <rect x="688" y="126" width="24" height="24" class="duct duct--return drop"/>
 
     <!-- ceiling grilles -->
     <line x1="820" y1="150" x2="850" y2="150" class="grille"/>
     <text x="820" y="168" class="anno small-anno">SUPPLY GRILLE</text>
-    <line x1="890" y1="150" x2="914" y2="150" class="grille grille--return"/>
-    <text x="862" y="176" class="anno small-anno return-anno">RETURN</text>
+    <line x1="688" y1="150" x2="712" y2="150" class="grille grille--return"/>
+    <text x="688" y="168" class="anno small-anno return-anno">RETURN</text>
 
     <!-- room furniture: bed, nightstand -->
     <path d="M300 404 L300 340 L620 340 L620 404" class="furn"/>
-    <path d="M300 340 L300 310 L380 310 L380 340" class="furn"/> <!-- headboard -->
-    <path d="M640 404 L640 364 L710 364 L710 404" class="furn"/> <!-- nightstand -->
-    <text x="310" y="356" class="anno small-anno furn-anno">BEDROOM</text>
+    <path d="M300 340 L300 310 L380 310 L380 340" class="furn"/>
+    <path d="M640 404 L640 364 L710 364 L710 404" class="furn"/>
+    <text x="310" y="360" class="anno small-anno furn-anno">BEDROOM</text>
 
-    <!-- dimension line: ceiling height -->
+    <!-- dimension: ceiling height -->
     <line x1="260" y1="150" x2="260" y2="404" class="dim"/>
     <line x1="252" y1="150" x2="268" y2="150" class="dim-tick"/>
     <line x1="252" y1="404" x2="268" y2="404" class="dim-tick"/>
-    <text x="268" y="280" class="anno dim-label" transform="rotate(-90 268 280)">2600</text>
+    <text x="274" y="282" class="anno dim-label" transform="rotate(-90 274 282)">2600</text>
 
     <!-- dimension: ceiling void -->
     <line x1="968" y1="36" x2="968" y2="150" class="dim"/>
     <line x1="960" y1="36" x2="976" y2="36" class="dim-tick"/>
     <line x1="960" y1="150" x2="976" y2="150" class="dim-tick"/>
-    <text x="976" y="98" class="anno dim-label" transform="rotate(-90 976 98)">450</text>
+    <text x="982" y="98" class="anno dim-label" transform="rotate(-90 982 98)">450</text>
 
-    <!-- OUTDOOR label -->
-    <text x="26" y="34" class="anno big-anno">OUTDOOR</text>
-    <text x="26" y="50" class="anno small-anno">30°C · 85% RH</text>
-
-    <!-- SUPPLY air reading inside room -->
-    <text x="640" y="220" class="anno big-anno">SUPPLY</text>
-    <text x="640" y="236" class="anno small-anno">24°C · 55% RH</text>
+    <!-- supply reading, beside the drop -->
+    <text x="870" y="222" class="anno big-anno">SUPPLY</text>
+    <text x="870" y="238" class="anno small-anno">24°C · 55% RH</text>
 
     <!-- airflow lanes -->
     <g class="lane-in">
-      {intake.map((i) => <circle cx="210" cy={76} r="4" class="d-wet" style={`--i:${i}`} />)}
+      {intake.map((i) => <circle cx="210" cy="76" r="4" class="d-wet" style={`--i:${i}`} />)}
     </g>
     <g class="lane-sup">
-      {supply.map((i) => <circle cx="628" cy={75} r="4" class="d-dry" style={`--i:${i}`} />)}
+      {supply.map((i) => <circle cx="628" cy="67" r="4" class="d-dry" style={`--i:${i}`} />)}
     </g>
     <g class="lane-drop">
-      {roomfall.map((i) => <circle cx="835" cy="160" r="4" class="d-dry" style={`--i:${i}`} />)}
+      {roomfall.map((i) => <circle cx="835" cy="92" r="4" class="d-dry" style={`--i:${i}`} />)}
     </g>
     <g class="lane-return">
-      {roomReturn.map((i) => <circle cx="902" cy="160" r="3.4" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+      {roomReturn.map((i) => <circle cx="700" cy="190" r="3.4" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
     </g>
     <g class="lane-exh">
-      {exhaust.map((i) => <circle cx="810" cy="128" r="3.4" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+      {exhaust.map((i) => <circle cx="372" cy="115" r="3.4" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
     </g>
 
-    <!-- title block (bottom right) -->
+    <!-- title block, below the drawing -->
     <g class="titleblock">
-      <line x1="200" y1="400" x2="996" y2="400" class="rule-hard"/>
-      <text x="206" y="396" class="anno tb">SECTION A–A · CEILING-CONCEALED ERV + FRESH-AIR DEHUMIDIFIER</text>
-      <text x="996" y="396" text-anchor="end" class="anno tb">DRG 01 · erv.sg</text>
+      <line x1="0" y1="440" x2="1000" y2="440" class="rule-hard"/>
+      <text x="10" y="460" class="anno tb">SECTION A–A · CEILING-CONCEALED ERV + FRESH-AIR DEHUMIDIFIER</text>
+      <text x="990" y="460" text-anchor="end" class="anno tb">DRG 01 · erv.sg</text>
     </g>
   </svg>
   <span class="scroll-hint">◂ scroll ▸</span>
@@ -268,6 +259,7 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
   .unit { fill: var(--panel); stroke: var(--rule); stroke-width: 1.8; }
   .coil line { stroke: var(--dry); stroke-width: 1.4; }
   .core { fill: none; stroke: var(--rule); stroke-width: 1.4; }
+  .unit-rule { stroke: var(--rule); stroke-width: 0.8; opacity: 0.5; }
   .fan { fill: var(--panel); stroke: var(--rule); stroke-width: 1.2; }
   .fan-blade { fill: none; stroke: var(--rule); stroke-width: 1; }
   .grille { stroke: var(--rule); stroke-width: 4; stroke-dasharray: 3 2; }
@@ -302,10 +294,10 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
   .lane-drop-m circle { animation: lane-drop-m 6s linear infinite; animation-delay: calc(var(--i) * -1.2s); }
   .lane-ret-m circle { animation: lane-ret-m 6s ease-out infinite; animation-delay: calc(var(--i) * -1.5s); }
   .lane-exh-m circle { animation: lane-exh-m 6s linear infinite; animation-delay: calc(var(--i) * -1.5s); }
-  @keyframes lane-in-m { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: .9; } 85% { opacity: .9; } 100% { transform: translateX(80px); opacity: 0; } }
-  @keyframes lane-drop-m { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(170px); opacity: 0; } }
-  @keyframes lane-ret-m { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .55; } 100% { transform: translateY(-80px); opacity: 0; } }
-  @keyframes lane-exh-m { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: .5; } 100% { transform: translateX(-90px); opacity: 0; } }
+  @keyframes lane-in-m { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: .9; } 85% { opacity: .9; } 100% { transform: translateX(74px); opacity: 0; } }
+  @keyframes lane-drop-m { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(180px); opacity: 0; } }
+  @keyframes lane-ret-m { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .55; } 100% { transform: translateY(-52px); opacity: 0; } }
+  @keyframes lane-exh-m { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: .5; } 100% { transform: translateX(-72px); opacity: 0; } }
 
   .vapour circle { animation: bob 9s ease-in-out infinite; animation-delay: calc(var(--i) * -0.6s); }
   .lane-in circle { animation: lane-in 6s linear infinite; animation-delay: calc(var(--i) * -1s); }
@@ -315,11 +307,11 @@ const vapour = Array.from({ length: 10 }, (_, i) => i);
   .lane-exh circle { animation: lane-exh 6s linear infinite; animation-delay: calc(var(--i) * -1.5s); }
 
   @keyframes bob { 0%,100% { transform: translate(0,0); } 50% { transform: translate(4px,-5px); } }
-  @keyframes lane-in { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: .9; } 85% { opacity: .9; } 100% { transform: translateX(165px); opacity: 0; } }
+  @keyframes lane-in { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: .9; } 85% { opacity: .9; } 100% { transform: translateX(160px); opacity: 0; } }
   @keyframes lane-sup { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(190px); opacity: 0; } }
-  @keyframes lane-drop { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(170px); opacity: 0; } }
-  @keyframes lane-return { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .6; } 100% { transform: translateY(-55px); opacity: 0; } }
-  @keyframes lane-exh { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: .5; } 100% { transform: translateX(-180px); opacity: 0; } }
+  @keyframes lane-drop { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(240px); opacity: 0; } }
+  @keyframes lane-return { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .6; } 100% { transform: translateY(-80px); opacity: 0; } }
+  @keyframes lane-exh { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: .5; } 100% { transform: translateX(-165px); opacity: 0; } }
 
   @media (prefers-reduced-motion: reduce) {
     .lane-in circle { transform: translateX(calc(var(--i) * 28px)); opacity: .9; }
