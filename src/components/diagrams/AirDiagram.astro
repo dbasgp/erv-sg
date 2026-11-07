@@ -1,0 +1,129 @@
+---
+// Drafting-sheet airflow diagrams for How it works. Same visual language as HeroAir:
+// grid underlay, mono annotations, red (humid in) + blue (dry out), title block.
+interface Props { type: 'dehumidifier' | 'fresh-air' | 'hrv' | 'erv'; title: string; desc: string }
+const { type, title, desc } = Astro.props;
+const id = `dg-${type}`;
+const drg = { dehumidifier: 'DRG 02', 'fresh-air': 'DRG 03', hrv: 'DRG 04', erv: 'DRG 05' }[type];
+const titleLabel = {
+  dehumidifier: 'CEILING DEHUMIDIFIER · AIRFLOW',
+  'fresh-air': 'FRESH-AIR DEHUMIDIFIER · AIRFLOW',
+  hrv: 'HRV · AIRFLOW',
+  erv: 'ERV · AIRFLOW',
+}[type];
+---
+<svg viewBox="0 0 480 300" role="img" aria-labelledby={`${id}-t ${id}-d`} class="diagram" preserveAspectRatio="xMidYMid meet">
+  <title id={`${id}-t`}>{title}</title>
+  <desc id={`${id}-d`}>{desc}</desc>
+  <defs>
+    <pattern id={`${id}-grid`} width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0 H0 V20" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+    </pattern>
+    <marker id={`${id}-humid`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--wet)"/></marker>
+    <marker id={`${id}-dry`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--dry)"/></marker>
+    <marker id={`${id}-stale`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink-2)"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="480" height="300" fill={`url(#${id}-grid)`} class="grid"/>
+
+  <!-- outdoor band -->
+  <rect x="0" y="0" width="110" height="300" class="zone-out"/>
+  <line x1="110" y1="0" x2="110" y2="300" class="wall"/>
+
+  <text x="10" y="22" class="anno big-anno">OUTDOOR</text>
+  <text x="372" y="22" class="anno big-anno">ROOM</text>
+
+  {type === 'dehumidifier' && (
+    <>
+      <rect x="200" y="100" width="130" height="90" class="unit"/>
+      <text x="265" y="138" class="anno unit-label" text-anchor="middle">DEHUMIDIFIER</text>
+      <text x="265" y="156" class="anno small-anno" text-anchor="middle">room air only</text>
+      <g class="coil">{[221, 230, 239, 248].map((x) => <line x1={x} y1="162" x2={x} y2="184"/>)}</g>
+
+      <path d="M450 120 H340" class="a-dry" marker-end={`url(#${id}-dry)`}/>
+      <path d="M340 170 H450" class="a-dry" marker-end={`url(#${id}-dry)`}/>
+      <text x="395" y="112" class="anno small-anno" text-anchor="middle">room air</text>
+      <text x="395" y="186" class="anno small-anno" text-anchor="middle">drier air</text>
+
+      <path d="M265 190 V250 H230" class="a-drain"/>
+      <text x="212" y="263" class="anno small-anno">to drain</text>
+
+      <text x="10" y="150" class="anno small-anno">no fresh</text>
+      <text x="10" y="166" class="anno small-anno">air involved</text>
+    </>
+  )}
+
+  {type === 'fresh-air' && (
+    <>
+      <rect x="180" y="90" width="150" height="100" class="unit"/>
+      <text x="255" y="124" class="anno unit-label" text-anchor="middle">FILTER + DEHU</text>
+      <text x="255" y="142" class="anno small-anno" text-anchor="middle">outdoor air dried</text>
+      <g class="filter-g">
+        {[195, 203, 211].map((x) => <line x1={x} y1="100" x2={x} y2="180" stroke-dasharray="2 2"/>)}
+      </g>
+      <g class="coil">{[280, 290, 300, 310].map((x) => <line x1={x} y1="155" x2={x} y2="182"/>)}</g>
+
+      <path d="M22 140 H178" class="a-humid" marker-end={`url(#${id}-humid)`}/>
+      <path d="M332 140 H450" class="a-dry" marker-end={`url(#${id}-dry)`}/>
+      <text x="100" y="132" class="anno small-anno" text-anchor="middle">humid outdoor</text>
+      <text x="390" y="132" class="anno small-anno" text-anchor="middle">fresh + dry</text>
+
+      <path d="M255 190 V252 H222" class="a-drain"/>
+      <text x="205" y="265" class="anno small-anno">to drain</text>
+
+      <path d="M450 190 H332" class="a-stale a-stale--dashed" marker-end={`url(#${id}-stale)`}/>
+      <text x="390" y="206" class="anno small-anno ink-2" text-anchor="middle">optional recirc</text>
+    </>
+  )}
+
+  {(type === 'hrv' || type === 'erv') && (
+    <>
+      <path d="M240 70 L330 150 L240 230 L150 150 Z" class="unit"/>
+      <text x="240" y="152" class="anno unit-label" text-anchor="middle">{type === 'erv' ? 'ENTHALPY CORE' : 'HEAT CORE'}</text>
+      <text x="240" y="170" class="anno small-anno" text-anchor="middle">{type === 'erv' ? 'heat + moisture' : 'heat only'}</text>
+
+      <!-- outdoor → room (top stream) -->
+      <path d="M22 100 H158" class="a-humid" marker-end={`url(#${id}-humid)`}/>
+      <path d={type === 'erv' ? 'M322 100 H450' : 'M322 100 H450'} class={type === 'erv' ? 'a-dry' : 'a-humid'} marker-end={`url(#${id}-${type === 'erv' ? 'dry' : 'humid'})`}/>
+
+      <!-- room → outdoor (bottom stream) -->
+      <path d="M450 200 H322" class="a-stale" marker-end={`url(#${id}-stale)`}/>
+      <path d="M158 200 H22" class="a-stale" marker-end={`url(#${id}-stale)`}/>
+
+      <text x="100" y="90" class="anno small-anno" text-anchor="middle">humid in</text>
+      <text x="390" y="90" class="anno small-anno" text-anchor="middle">{type === 'erv' ? 'cooler + drier' : 'cooler, still humid'}</text>
+      <text x="100" y="222" class="anno small-anno" text-anchor="middle">stale out</text>
+      <text x="390" y="222" class="anno small-anno" text-anchor="middle">room air leaves</text>
+    </>
+  )}
+
+  <!-- title block -->
+  <line x1="0" y1="278" x2="480" y2="278" class="rule-hard"/>
+  <text x="6" y="291" class="anno tb">{titleLabel}</text>
+  <text x="474" y="291" text-anchor="end" class="anno tb">{drg}</text>
+</svg>
+
+<style>
+  .diagram { width: 100%; height: auto; background: var(--panel); border: 1px solid var(--rule); display: block; color: var(--ink); }
+  .grid { color: var(--ink); }
+  .zone-out { fill: color-mix(in srgb, var(--wet) 9%, var(--panel)); }
+  .wall { stroke: var(--rule); stroke-width: 3; }
+  .unit { fill: var(--panel); stroke: var(--rule); stroke-width: 1.6; }
+  .coil line { stroke: var(--dry); stroke-width: 1.4; }
+  .filter-g line { stroke: var(--ink-2); stroke-width: 1.4; }
+
+  .a-humid, .a-dry, .a-stale, .a-drain { fill: none; stroke-width: 2.4; }
+  .a-humid { stroke: var(--wet); }
+  .a-dry { stroke: var(--dry); }
+  .a-stale { stroke: var(--ink-2); stroke-width: 1.6; stroke-dasharray: 5 4; }
+  .a-stale--dashed { stroke-dasharray: 5 4; }
+  .a-drain { stroke: var(--dry); stroke-width: 1.4; stroke-dasharray: 3 3; }
+
+  text.anno { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; fill: var(--ink-2); letter-spacing: 0.04em; }
+  text.big-anno { font-size: 12px; fill: var(--ink); font-weight: 500; letter-spacing: 0.06em; }
+  text.small-anno { font-size: 10px; }
+  text.unit-label { fill: var(--ink); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; }
+  text.tb { font-size: 10px; letter-spacing: 0.08em; fill: var(--ink); }
+  text.ink-2 { fill: var(--ink-2); }
+  .rule-hard { stroke: var(--rule); stroke-width: 1; }
+</style>

@@ -1,0 +1,99 @@
+/* erv.sg — design tokens. Palette: drafting paper, red/blue only for airflow. */
+:root {
+  color-scheme: light dark;
+
+  /* Light — cool drafting white */
+  --paper: #edf1f2;
+  --panel: #f6f9f9;
+  --rule: #141618;
+  --ink: #141618;
+  --ink-2: #5b6670;
+  --line: #c9d0d3;
+  --line-strong: #8f989d;
+
+  /* Diagram only — airflow */
+  --wet: #b33a1e;   /* humid outdoor air, in */
+  --dry: #1e3a52;   /* dry supply air, out */
+
+  --focus: #1e3a52;
+
+  --font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Type scale — fixed, not fluid everywhere */
+  --fs-display: clamp(2rem, 1.3rem + 2.8vw, 3rem);     /* 32–48 */
+  --fs-h1: clamp(1.6rem, 1.2rem + 1.6vw, 2.125rem);    /* 25.6–34 */
+  --fs-h2: clamp(1.25rem, 1.05rem + 0.8vw, 1.5rem);    /* 20–24 */
+  --fs-h3: 1.125rem;
+  --fs-body: 1.0625rem;
+  --fs-meta: 0.8125rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6.5rem;
+
+  --radius: 0;
+  --max: 76rem;
+  --measure: 36rem;
+  --gutter: 20px;
+  --tap: 44px;
+  --hair: 1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #0f1418;
+    --panel: #141a1e;
+    --rule: #e6ecee;
+    --ink: #e6ecee;
+    --ink-2: #8995a0;
+    --line: #2a3137;
+    --line-strong: #4a545c;
+    --wet: #eb7e5c;
+    --dry: #7fb0d6;
+    --focus: #7fb0d6;
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #0f1418;
+  --panel: #141a1e;
+  --rule: #e6ecee;
+  --ink: #e6ecee;
+  --ink-2: #8995a0;
+  --line: #2a3137;
+  --line-strong: #4a545c;
+  --wet: #eb7e5c;
+  --dry: #7fb0d6;
+  --focus: #7fb0d6;
+}
+
+@media (min-width: 48rem) {
+  :root { --gutter: 32px; }
+}
+
+/* Back-compat aliases so older component CSS keeps rendering. */
+:root, :root[data-theme='dark'] {
+  --bg: var(--paper);
+  --surface: var(--panel);
+  --surface-2: var(--panel);
+  --accent: var(--rule);
+  --accent-hover: var(--rule);
+  --accent-ink: var(--paper);
+  --muted: var(--ink-2);
+  --humid: var(--wet);
+  --stale: var(--ink-2);
+  --step--1: var(--fs-meta);
+  --step-0: var(--fs-body);
+  --step-1: var(--fs-h3);
+  --step-2: var(--fs-h2);
+  --step-3: var(--fs-h1);
+  --step-4: var(--fs-display);
+}
+

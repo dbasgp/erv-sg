@@ -1,0 +1,7 @@
+---
+import { ASK } from '../data/specs';
+interface Props { value: string | null; unit?: string }
+const { value, unit } = Astro.props;
+---
+{value === null ? <span class="na">—</span> : <>{value}{unit && <span class="unit"> {unit}</span>}</>}
+<style>.unit { color: var(--muted); }</style>

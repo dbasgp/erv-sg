@@ -1,0 +1,116 @@
+---
+import Base from '../layouts/Base.astro';
+import AirDiagram from '../components/diagrams/AirDiagram.astro';
+
+const types = [
+  {
+    id: 'dehumidifier',
+    name: 'Ceiling dehumidifier',
+    link: '/products/ceiling-dehumidifiers/',
+    desc: 'Room air passes over a cold coil, moisture condenses and drains away, and drier air returns to the room. No outdoor air is involved.',
+    text: [
+      'A ceiling dehumidifier works on the room air you already have. A fan draws it over a cold coil, water condenses out and runs to a drain, and the drier air goes back through ducts and grilles.',
+      'It is the simplest way to keep a room dry, and it runs whether the aircon is on or off. It does not bring in fresh air, so it will not lower CO₂ in a closed room.',
+    ],
+    fits: 'Wardrobes, store rooms, basements, wine rooms, and homes that already have a fresh-air supply.',
+  },
+  {
+    id: 'fresh-air',
+    name: 'Fresh-air dehumidifier',
+    link: '/products/fresh-air-dehumidifiers/',
+    desc: 'Humid outdoor air passes through a filter and a drying coil inside the unit, then enters the room as fresh, drier air. Optional recirculation of room air.',
+    text: [
+      'A fresh-air dehumidifier takes in outdoor air, filters it and dries it before it reaches the room. Many models can also mix in room air and dry that too.',
+      'This deals with both problems in a sealed room: stale air and humidity. Because the outdoor air is dried first, ventilating no longer makes the room damper.',
+    ],
+    fits: 'Bedrooms that stay closed with the aircon on, condo units without good cross-ventilation, small clinics and offices.',
+  },
+  {
+    id: 'hrv',
+    name: 'HRV (heat recovery ventilator)',
+    link: null,
+    desc: 'Fresh outdoor air and stale room air cross inside a heat core without mixing. Heat transfers between them, but moisture does not, so incoming air is cooler but still humid.',
+    text: [
+      'An HRV supplies fresh air and exhausts stale air at the same time. The two streams pass each other in a heat exchanger, so the cool outgoing air takes some heat out of the warm incoming air.',
+      'It does not move moisture. In a cold climate that is fine. In Singapore, the incoming air arrives cooler but almost as humid as it was outside.',
+    ],
+    fits: 'Spaces where humidity is handled separately, or where moisture transfer between the airstreams is not wanted.',
+  },
+  {
+    id: 'erv',
+    name: 'ERV (energy recovery ventilator)',
+    link: '/products/erv-systems/',
+    desc: 'Fresh outdoor air and stale room air cross inside an enthalpy core. Heat and part of the moisture transfer to the outgoing air, so incoming air is cooler and less humid.',
+    text: [
+      'An ERV works like an HRV, but its enthalpy core also passes part of the moisture from the incoming air to the outgoing air. Fresh air arrives cooler and less humid, and the aircon has less to remove.',
+      'An ERV reduces the moisture coming in, but it is not a dehumidifier. In very humid weather, or where rooms need to stay drier, pair it with a dehumidifier.',
+    ],
+    fits: 'Whole-home fresh air in condos and landed homes, classrooms, offices and meeting rooms.',
+  },
+] as const;
+---
+<Base
+  title="How it works: ERV vs HRV vs fresh-air dehumidifier vs dehumidifier"
+  description="How ceiling dehumidifiers, fresh-air dehumidifiers, HRVs and ERVs handle fresh air and humidity in Singapore's climate, with simple airflow diagrams."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'How it works', href: '/how-it-works/' }]}
+>
+  <header class="wrap page-head">
+    <h1>How it works</h1>
+    <p class="lede">Four kinds of equipment handle two jobs: getting fresh air in, and getting moisture out. Here's what each one does — and what it doesn't.</p>
+  </header>
+
+  {types.map((t, i) => (
+    <section class="section wrap hw-section" id={t.id}>
+      <div class="secthead">
+        <div>
+          <p class="eyebrow">Step {String(i+1).padStart(2,'0')} · unit type</p>
+          <h2>{t.name}</h2>
+        </div>
+        <span class="ref">DRG {String(i+2).padStart(2,'0')}</span>
+      </div>
+      <div class="hw">
+        <figure class="fig">
+          <AirDiagram type={t.id} title={`${t.name} airflow`} desc={t.desc} />
+          <figcaption><span class="fig">DRG {String(i+2).padStart(2,'0')}</span>{t.name} — airflow schematic</figcaption>
+        </figure>
+        <div class="prose">
+          {t.text.map((para) => <p>{para}</p>)}
+          <p><strong>Good fit:</strong> {t.fits}</p>
+          {t.link && <p><a href={t.link}>See the range →</a></p>}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section wrap">
+    <div class="secthead">
+      <div><p class="eyebrow">Comparison</p><h2>Side by side</h2></div>
+      <span class="ref">TBL 01</span>
+    </div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Comparison of the four types">
+      <table class="datasheet">
+        <thead>
+          <tr><th scope="col"></th><th scope="col">Fresh air in</th><th scope="col">Stale air out</th><th scope="col">Recovers cooling</th><th scope="col">Lowers humidity</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Ceiling dehumidifier</th><td>—</td><td>—</td><td>—</td><td>yes</td></tr>
+          <tr><th scope="row">Fresh-air dehumidifier</th><td>yes</td><td>depends</td><td>—</td><td>yes</td></tr>
+          <tr><th scope="row">HRV</th><td>yes</td><td>yes</td><td>yes</td><td>—</td></tr>
+          <tr><th scope="row">ERV</th><td>yes</td><td>yes</td><td>yes</td><td>partly, on incoming</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p>In most sealed, air-conditioned rooms in Singapore the answer is an ERV or a fresh-air dehumidifier, often with a ceiling dehumidifier where the room needs to stay drier. <a href="/contact/#quote">Tell us about your space</a> and we'll suggest a combination.</p>
+    </div>
+  </section>
+</Base>
+<style>
+  .hw-section + .hw-section { border-top: 0; }
+  .hw { display: grid; gap: var(--space-6); }
+  @media (min-width: 56rem) { .hw { grid-template-columns: 5fr 7fr; gap: var(--space-8); align-items: start; } }
+  .prose h2 { margin-top: 0; }
+  .fig { margin: 0; }
+  .datasheet tbody th { font-family: var(--font-sans); font-weight: 500; color: var(--ink); white-space: nowrap; }
+  .datasheet td { font-family: var(--font-mono); font-size: 0.9rem; color: var(--ink-2); }
+</style>

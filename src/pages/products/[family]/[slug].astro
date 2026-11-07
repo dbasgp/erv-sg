@@ -1,0 +1,187 @@
+---
+import Base from '../../../layouts/Base.astro';
+import SpecTable from '../../../components/SpecTable.astro';
+import CertBadges from '../../../components/CertBadges.astro';
+import R290Note from '../../../components/R290Note.astro';
+import { Image, getImage } from 'astro:assets';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { familyBySlug } from '../../../data/families';
+import { productImage } from '../../../data/images';
+import { productLd } from '../../../data/schema';
+import { detailFields, specLabels, fmt, isR290 } from '../../../data/specs';
+import { waHref } from '../../../config/site';
+
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  return products.map((p) => ({ params: { family: p.data.family, slug: p.data.slug }, props: { product: p } }));
+}
+const { product } = Astro.props as { product: CollectionEntry<'products'> };
+const p = product.data;
+const family = familyBySlug(p.family)!;
+const path = `/products/${p.family}/${p.slug}/`;
+const images = p.images.map(productImage).filter((x): x is ImageMetadata => !!x);
+const ogImg = images[0] ? await getImage({ src: images[0], width: 1200, format: 'jpg' }) : null;
+const props = detailFields[p.family]
+  .map((k) => ({ k, v: fmt(p, k) }))
+  .filter((x) => x.v !== null)
+  .map((x) => ({ name: specLabels[x.k]?.label ?? x.k, value: `${x.v}${specLabels[x.k]?.unit ? ' ' + specLabels[x.k]?.unit : ''}` }));
+const ld = productLd({ model: p.model, summary: p.summary, path, image: ogImg?.src, category: family.name, series: p.series, props });
+const waText = `Hi, I'd like a quote or datasheet for the ${p.model} (erv.sg).`;
+
+// Headline figures above the fold: capacity, airflow, noise, power — whichever exist
+const headline = [
+  { k: 'capacity_l_per_day', suffix: 'L/day', label: 'Capacity' },
+  { k: 'airflow_m3h', suffix: 'm³/h', label: 'Airflow' },
+  { k: 'noise_db', suffix: 'dB(A)', label: 'Noise' },
+  { k: 'power_w', suffix: 'W', label: 'Power' },
+].map(h => ({ ...h, val: fmt(p, h.k as any) }));
+
+const install = [
+  { n: '01', t: 'Position above the slab, with service access', d: 'Minimum 300 mm clear below the slab. Service hatch opposite the filter face.' },
+  { n: '02', t: 'Duct to the grille', d: 'Insulated flexible or rigid duct between the unit and the supply grille. Keep bends to a minimum.' },
+  { n: '03', t: 'Drain to the nearest floor trap', d: 'Continuous gravity drain, 1:100 fall. No pump required for most installs.' },
+  { n: '04', t: 'Power from the aircon fused spur', d: 'Dedicated fused spur per unit. Isolator within reach of the service hatch.' },
+];
+---
+<Base
+  title={`${p.model} ${family.singular}`}
+  description={`${p.model}, ${p.series} series. ${p.summary} Specifications, datasheet and quotes for Singapore projects.`}
+  ogImage={images[0]}
+  ogType="product"
+  jsonLd={[ld]}
+  waText={waText}
+  crumbs={[
+    { name: 'Home', href: '/' },
+    { name: 'Products', href: '/products/' },
+    { name: family.name, href: `/products/${family.slug}/` },
+    { name: p.model, href: path },
+  ]}
+>
+  <!-- submittal header strip -->
+  <div class="submittal wrap">
+    <div class="sheet-meta">
+      <span class="label-mono">Submittal · product sheet</span>
+      <span class="label-mono">Series {p.series} · {family.name}</span>
+    </div>
+    <h1 class="model-no">{p.model}</h1>
+    <p class="lede">{p.summary}</p>
+    {isR290(p) && <R290Note />}
+  </div>
+
+  <!-- headline figures -->
+  <section class="wrap figures">
+    {headline.map((h) => (
+      <div class="fig-cell">
+        <span class="label-mono">{h.label}</span>
+        <span class="fig-val">{h.val ?? '—'}<span class="fig-unit"> {h.suffix}</span></span>
+      </div>
+    ))}
+    <div class="fig-actions">
+      <a class="btn" href={`/contact/?model=${p.slug}#quote`}>Request a quote</a>
+      {p.datasheet_pdf
+        ? <a class="btn btn--quiet" href={p.datasheet_pdf} download>Datasheet (PDF)</a>
+        : <a class="btn btn--quiet" href={waHref(`Hi, please send me the datasheet for the ${p.model}.`)} target="_blank" rel="noopener" data-wa="datasheet">Ask for datasheet</a>}
+    </div>
+  </section>
+
+  <!-- product elevation + detail -->
+  <section class="wrap pd">
+    <figure class="elev">
+      {images[0]
+        ? <Image src={images[0]} alt={`${p.model}, side view`} widths={[520, 900]} sizes="(min-width: 56rem) 520px, 100vw" loading="eager" />
+        : <div class="placeholder elev-ph">ELEVATION · DIMENSIONS TO BE ADDED</div>}
+      <figcaption><span class="fig">FIG 01</span>{p.model} — product elevation</figcaption>
+    </figure>
+    <div class="detail">
+      <CertBadges items={p.certifications} />
+      <h2>Specifications</h2>
+      <SpecTable product={product} />
+      <p class="small muted">Figures are from the manufacturer datasheet under its stated test conditions. Actual performance depends on room conditions and installation.</p>
+    </div>
+  </section>
+
+  <!-- install sequence — numbered because it's a real sequence -->
+  <section class="section wrap">
+    <div class="secthead">
+      <div>
+        <p class="eyebrow">Install notes</p>
+        <h2>Four things the installer needs to see</h2>
+      </div>
+      <span class="ref">INST-01</span>
+    </div>
+    <ol class="install">
+      {install.map((i) => (
+        <li>
+          <span class="num label-mono">{i.n}</span>
+          <h3>{i.t}</h3>
+          <p>{i.d}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  {images.length > 1 && (
+    <section class="section wrap">
+      <div class="secthead">
+        <div>
+          <p class="eyebrow">Photos</p>
+          <h2>Product and site views</h2>
+        </div>
+        <span class="ref">PL 01–{String(images.length).padStart(2,'0')}</span>
+      </div>
+      <div class="plates">
+        {images.slice(1).map((img, i) => (
+          <figure>
+            <Image src={img} alt={`${p.model}, view ${i + 2}`} widths={[400, 720]} sizes="(min-width: 56rem) 360px, 100vw" />
+            <figcaption><span class="fig">PL {String(i+2).padStart(2,'0')}</span>{p.model}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .submittal { padding-block: var(--space-6) var(--space-5); border-bottom: 2px solid var(--rule); }
+  .sheet-meta { display: flex; justify-content: space-between; gap: var(--space-4); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); margin-bottom: var(--space-5); }
+
+  .model-no {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: clamp(2.4rem, 1.6rem + 3.5vw, 4rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 0 0 var(--space-4);
+  }
+  .lede { max-width: 56ch; }
+
+  .figures {
+    display: grid; grid-template-columns: 1fr; gap: var(--space-5);
+    padding-block: var(--space-6);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (min-width: 42rem) { .figures { grid-template-columns: repeat(2, 1fr) auto; } }
+  @media (min-width: 60rem) { .figures { grid-template-columns: repeat(4, 1fr) auto; align-items: end; } }
+  .fig-cell { display: flex; flex-direction: column; gap: var(--space-2); border-left: 1px solid var(--line); padding-left: var(--space-4); }
+  .fig-cell:first-child { border-left: 0; padding-left: 0; }
+  .fig-val { font-family: var(--font-mono); font-size: clamp(1.8rem, 1.2rem + 2vw, 2.4rem); font-weight: 500; letter-spacing: -0.02em; color: var(--ink); line-height: 1; }
+  .fig-unit { color: var(--ink-2); font-size: 0.55em; font-weight: 400; margin-left: 0.2em; }
+  .fig-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+
+  .pd { padding-block: var(--space-7); display: grid; gap: var(--space-7); }
+  @media (min-width: 56rem) { .pd { grid-template-columns: 5fr 7fr; gap: var(--space-8); align-items: start; } .elev { position: sticky; top: 88px; } }
+  .elev img { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--line); }
+  .elev-ph { aspect-ratio: 4/3; }
+  .detail h2 { font-size: var(--fs-h1); margin-top: 0; margin-bottom: var(--space-4); }
+
+  .install { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+  .install > li { display: grid; grid-template-columns: 3rem 1fr; gap: var(--space-3) var(--space-5); padding: var(--space-5) 0; border-bottom: 1px solid var(--line); margin: 0; align-items: baseline; }
+  .install .num { color: var(--ink-2); padding-top: 0.3em; }
+  .install h3 { font-size: var(--fs-h3); font-family: var(--font-sans); font-weight: 500; margin: 0 0 var(--space-2); grid-column: 2; }
+  .install p { grid-column: 2; margin: 0; color: var(--ink-2); max-width: 56ch; }
+
+  .plates { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+  @media (min-width: 42rem) { .plates { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 72rem) { .plates { grid-template-columns: repeat(3, 1fr); } }
+  .plates img { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--line); aspect-ratio: 4/3; object-fit: cover; }
+</style>

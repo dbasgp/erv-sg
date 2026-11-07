@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+<Base
+  title="Terms of use"
+  description="Terms of use for the erv.sg website, operated by DBA Electric Pte. Ltd."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Terms', href: '/terms/' }]}
+>
+  <header class="wrap page-head">
+    <h1>Terms of use</h1>
+    <p class="small muted">Last updated: {'{{TERMS_UPDATED_DATE}}'}</p>
+  </header>
+  <div class="wrap prose body">
+    <p>erv.sg is operated by {site.company.legalName} (UEN {site.company.uen}), {site.company.street}, Singapore. By using this site you agree to these terms.</p>
+    <h2>Information on this site</h2>
+    <p>Product information is provided for general reference. Specifications may change and are confirmed in the current datasheet and quotation. Nothing on this site is an offer for sale; prices and terms are given in a written quotation.</p>
+    <h2>Technical content</h2>
+    <p>Guides and explanations are general information, not engineering, legal or professional advice. Projects should be designed and installed by qualified people in line with the applicable regulations.</p>
+    <h2>Warranty</h2>
+    <p>Warranty terms are set out in the quotation and product documentation. Summary: {site.warranty}.</p>
+    <h2>Intellectual property</h2>
+    <p>Text, diagrams and images on this site belong to {site.company.legalName} unless stated otherwise, and may not be reused without permission. Datasheets may be used for specifying our products.</p>
+    <h2>Liability</h2>
+    <p>To the extent permitted by law, we are not liable for loss arising from use of this site or reliance on its general information.</p>
+    <h2>Governing law</h2>
+    <p>These terms are governed by the laws of Singapore.</p>
+  </div>
+</Base>
+<style>.body { padding-bottom: var(--space-7); }</style>

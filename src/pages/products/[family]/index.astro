@@ -1,0 +1,90 @@
+---
+import Base from '../../../layouts/Base.astro';
+import ProductRows from '../../../components/ProductRows.astro';
+import CompareTable from '../../../components/CompareTable.astro';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { families, type Family } from '../../../data/families';
+import { getProducts } from '../../../data/products';
+import { productImage } from '../../../data/images';
+
+export function getStaticPaths() {
+  return families.map((f) => ({ params: { family: f.slug }, props: { family: f } }));
+}
+const { family } = Astro.props as { family: Family };
+const items = await getProducts(family.slug);
+const apps = (await getCollection('applications'))
+  .filter((a) => a.data.families.includes(family.slug))
+  .sort((a, b) => a.data.order - b.data.order);
+const img = productImage(family.image);
+---
+<Base
+  title={family.title}
+  description={family.description}
+  ogImage={img}
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products/' }, { name: family.name, href: `/products/${family.slug}/` }]}
+  waText={`Hi, I'd like to ask about your ${family.name.toLowerCase()} (erv.sg).`}
+>
+  <header class="wrap page-head">
+    <p class="eyebrow">Product family · {family.slug}</p>
+    <h1>{family.name}</h1>
+    <div class="fam-grid">
+      <div>
+        <p class="lede">{family.intro}</p>
+        <ul class="points">{family.points.map((p) => <li>{p}</li>)}</ul>
+        <div class="actions">
+          <a class="btn" href={`/contact/?family=${encodeURIComponent(family.name)}#quote`}>Request a quote</a>
+          <a class="btn btn--quiet" href="/how-it-works/">How it works</a>
+        </div>
+      </div>
+      {img
+        ? <figure class="fam-fig">
+            <Image src={img} alt={family.imageAlt ?? family.name} widths={[400, 720]} sizes="(min-width: 56rem) 420px, 100vw" loading="eager" />
+            <figcaption><span class="fig">FIG 01</span>{family.name}</figcaption>
+          </figure>
+        : <figure class="fam-fig"><div class="placeholder">PHOTO PENDING</div><figcaption><span class="fig">FIG 01</span>{family.name}</figcaption></figure>}
+    </div>
+  </header>
+
+  <section class="section wrap">
+    <div class="secthead">
+      <div><p class="eyebrow">Models in this family</p><h2>Models</h2></div>
+      <span class="ref">index</span>
+    </div>
+    <ProductRows products={items} />
+  </section>
+
+  <section class="section wrap">
+    <div class="secthead">
+      <div><p class="eyebrow">Compare</p><h2>Side-by-side specifications</h2></div>
+      <span class="ref">cmp</span>
+    </div>
+    <p class="small muted">Blank cells (—) are values we haven't published yet. Ask for the full datasheet.</p>
+    <CompareTable family={family.slug} products={items} />
+  </section>
+
+  {apps.length > 0 && (
+    <section class="section wrap">
+      <div class="secthead">
+        <div><p class="eyebrow">Typical uses</p><h2>Where this family goes in</h2></div>
+        <span class="ref">app</span>
+      </div>
+      <ul class="register">
+        {apps.map((a) => (
+          <li><a href={`/applications/${a.id}/`}>
+            <span class="num">{String(a.data.order ?? 0).padStart(2,'0')}</span>
+            <span class="title">{a.data.title}</span>
+            <span class="meta">brief →</span>
+          </a></li>
+        ))}
+      </ul>
+    </section>
+  )}
+</Base>
+<style>
+  .fam-grid { display: grid; gap: var(--space-6); }
+  @media (min-width: 56rem) { .fam-grid { grid-template-columns: 1fr 420px; gap: var(--space-8); align-items: start; } }
+  .fam-fig img, .fam-fig .placeholder { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--line); aspect-ratio: 4/3; object-fit: cover; }
+  .points { max-width: 56ch; margin-bottom: var(--space-6); font-family: var(--font-serif); padding-left: 1.1em; }
+  .points li { margin-top: var(--space-2); }
+</style>

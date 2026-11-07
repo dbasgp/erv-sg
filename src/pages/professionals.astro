@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { getProducts } from '../data/products';
+import { familyBySlug } from '../data/families';
+import { waHref } from '../config/site';
+const products = await getProducts();
+---
+<Base
+  title="For professionals: datasheets, CAD files and sizing help"
+  description="Specifier resources for M&E consultants, contractors and interior designers in Singapore: datasheets, CAD/BIM files, sizing help and trade partner sign-up."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'For professionals', href: '/professionals/' }]}
+  waText="Hi, I'm a specifier/contractor and would like technical information (erv.sg)."
+>
+  <header class="wrap page-head">
+    <h1>For consultants, contractors and IDs</h1>
+    <p class="lede">Technical data for specifying DBA ceiling dehumidifiers, fresh-air dehumidifiers and ERVs on Singapore projects, plus help with sizing and a trade account for regular buyers.</p>
+  </header>
+
+  <section class="section wrap">
+    <h2>Datasheets and drawings</h2>
+    <p class="muted">Where a file isn't online yet, ask and we'll send it, usually the same working day.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Downloads by model">
+      <table>
+        <thead><tr><th scope="col">Model</th><th scope="col">Family</th><th scope="col">Datasheet</th><th scope="col">CAD (DWG)</th><th scope="col">BIM (Revit)</th></tr></thead>
+        <tbody>
+          {products.map((p) => (
+            <tr>
+              <th scope="row"><a href={`/products/${p.data.family}/${p.data.slug}/`}>{p.data.model}</a></th>
+              <td>{familyBySlug(p.data.family)?.name}</td>
+              <td>{p.data.datasheet_pdf ? <a href={p.data.datasheet_pdf} download>PDF</a> : <span class="na">On request</span>}</td>
+              <td><span class="na">On request</span></td>
+              <td><span class="na">On request</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="split">
+      <h2>Singapore codes and Green Mark</h2>
+      <div class="prose">
+        <p><strong>SS 553</strong> is the Singapore Standard code of practice for air-conditioning and mechanical ventilation (ACMV) in buildings. It covers how much outdoor air different spaces need and how ventilation systems should be designed.</p>
+        <p><strong>SS 554</strong> is the code of practice for indoor air quality in air-conditioned buildings. It sets out what good indoor air quality looks like and how it should be maintained, including humidity and CO₂.</p>
+        <p><strong>BCA Green Mark</strong> rewards buildings that use less energy and provide good indoor environments. Energy recovery on fresh air and good humidity control can support both, depending on how the project is assessed.</p>
+        <p class="small muted">This is a plain-language summary, not design guidance. Always work from the current published standards and the project's Green Mark criteria. We can provide equipment data for your calculations.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="split">
+      <h2>Sizing help</h2>
+      <div class="prose">
+        <p>Send us the floor plan, room heights, occupancy and what the space is used for. We'll suggest models and quantities, and send the datasheets so you can check them against your own calculations.</p>
+        <div class="actions">
+          <a class="btn btn--quiet" href="/contact/#quote">Send a sizing request</a>
+          <a class="btn btn--quiet" href={waHref('Hi, I need sizing help for a project (erv.sg).')} target="_blank" rel="noopener" data-wa="professionals">Ask on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="trade">
+    <div class="split">
+      <div>
+        <h2>Trade partner sign-up</h2>
+        <p class="muted">For contractors, interior designers and M&E firms who specify or install our equipment regularly. Trade partners get project pricing, technical support and priority on stock.</p>
+      </div>
+      <EnquiryForm variant="trade" />
+    </div>
+  </section>
+</Base>
+<style>tbody th { white-space: nowrap; }</style>

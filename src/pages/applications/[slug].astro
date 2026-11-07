@@ -1,0 +1,110 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { familyBySlug } from '../../data/families';
+
+export async function getStaticPaths() {
+  const apps = await getCollection('applications');
+  return apps.map((a) => ({ params: { slug: a.id }, props: { app: a } }));
+}
+const { app } = Astro.props as { app: CollectionEntry<'applications'> };
+const { Content } = await render(app);
+const fams = app.data.families.map((f) => familyBySlug(f)!);
+const path = `/applications/${app.id}/`;
+---
+<Base
+  title={`${app.data.title}: fresh air and humidity control in Singapore`}
+  description={app.data.description}
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Applications', href: '/applications/' }, { name: app.data.title, href: path }]}
+  waText={`Hi, I'm looking at fresh air / dehumidification for a ${app.data.title.toLowerCase()} project (erv.sg).`}
+>
+  <!-- Header as a brief slip -->
+  <header class="wrap submittal">
+    <div class="sheet-meta">
+      <span class="label-mono">Application brief · {String(app.data.order ?? 0).padStart(2,'0')}</span>
+      <span class="label-mono">erv.sg</span>
+    </div>
+    <h1>{app.data.title}</h1>
+    <p class="lede">{app.data.description}</p>
+  </header>
+
+  <!-- Problem + recommendation as two asymmetric bands, not stacked identical cards -->
+  <section class="section wrap">
+    <div class="secthead">
+      <div><p class="eyebrow">The problem</p><h2>What makes this space different</h2></div>
+      <span class="ref">note 01</span>
+    </div>
+    <div class="problem-block">
+      <p>{app.data.problem}</p>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="secthead">
+      <div><p class="eyebrow">What we recommend</p><h2>Equipment</h2></div>
+      <span class="ref">spec</span>
+    </div>
+    <ol class="fam-reg">
+      {fams.map((f, i) => (
+        <li>
+          <span class="num">{String(i+1).padStart(2,'0')}</span>
+          <div>
+            <h3><a href={`/products/${f.slug}/`}>{f.name}</a>{i === 0 && fams.length > 1 && <span class="pri label-mono">main</span>}</h3>
+            <p>{f.short}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section wrap">
+    <div class="secthead">
+      <div><p class="eyebrow">Typical setup</p><h2>How it usually goes in</h2></div>
+      <span class="ref">inst</span>
+    </div>
+    <ul class="setup">
+      {app.data.setup.map((s) => <li>{s}</li>)}
+    </ul>
+    <div class="prose"><Content /></div>
+  </section>
+
+  <section class="section wrap cta">
+    <div class="cta-grid">
+      <div>
+        <p class="eyebrow label-mono">Next step</p>
+        <h2>Send a floor plan and we'll suggest a setup</h2>
+      </div>
+      <div class="cta-actions">
+        <a class="btn" href={`/contact/?family=${encodeURIComponent(fams[0].name)}#quote`}>Request a quote</a>
+        <a class="btn btn--quiet" href="/applications/">Other applications</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .submittal { padding-block: var(--space-6) var(--space-5); border-bottom: 2px solid var(--rule); }
+  .sheet-meta { display: flex; justify-content: space-between; gap: var(--space-4); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); margin-bottom: var(--space-5); }
+  .submittal h1 { max-width: 20ch; margin-bottom: var(--space-4); }
+  .submittal .lede { margin-bottom: 0; }
+
+  .problem-block { border-left: 2px solid var(--wet); padding-left: var(--space-5); max-width: 60ch; }
+  .problem-block p { font-family: var(--font-serif); font-size: var(--fs-h3); color: var(--ink); margin: 0; }
+
+  .fam-reg { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+  .fam-reg > li { display: grid; grid-template-columns: 3rem 1fr; gap: var(--space-5); padding: var(--space-5) 0; border-bottom: 1px solid var(--line); margin: 0; align-items: baseline; }
+  .fam-reg .num { font-family: var(--font-mono); color: var(--ink-2); font-size: var(--fs-meta); letter-spacing: 0.05em; }
+  .fam-reg h3 { font-family: var(--font-sans); font-weight: 500; font-size: var(--fs-h3); margin: 0 0 var(--space-2); display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap; }
+  .fam-reg h3 a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 0.3em; }
+  .fam-reg h3 a:hover { text-decoration-color: var(--wet); }
+  .fam-reg .pri { color: var(--wet); font-size: var(--fs-meta); letter-spacing: 0.05em; }
+  .fam-reg p { margin: 0; color: var(--ink-2); max-width: 60ch; }
+
+  .setup { max-width: 56ch; padding-left: 1.1em; }
+  .setup li { margin-top: var(--space-2); font-family: var(--font-serif); }
+
+  .cta-grid { display: grid; gap: var(--space-5); border-top: 2px solid var(--rule); padding-top: var(--space-6); }
+  @media (min-width: 56rem) { .cta-grid { grid-template-columns: 7fr 5fr; gap: var(--space-8); align-items: end; } }
+  .cta-grid h2 { max-width: 22ch; margin: 0; }
+  .cta-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .cta-grid .eyebrow { margin: 0 0 var(--space-3); }
+</style>

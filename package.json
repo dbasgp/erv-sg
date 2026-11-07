@@ -1,0 +1,24 @@
+{
+  "name": "erv-sg",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "placeholders": "node scripts/placeholders.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "astro": "^5.18.2",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/source-serif-4": "^5.3.1"
+  }
+}

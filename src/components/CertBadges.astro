@@ -1,0 +1,13 @@
+---
+interface Props { items: string[] }
+const { items } = Astro.props;
+---
+{items.length > 0 && (
+  <ul class="certs" aria-label="Certifications">
+    {items.map((c) => <li>{c}</li>)}
+  </ul>
+)}
+<style>
+  .certs { list-style: none; padding: 0; margin: 0 0 var(--space-4); display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .certs li { margin: 0; border: 1px solid var(--accent); color: var(--accent); padding: 0.15rem 0.6rem; border-radius: var(--radius); font-size: var(--step--1); font-weight: 500; }
+</style>

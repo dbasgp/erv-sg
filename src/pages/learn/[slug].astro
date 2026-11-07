@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { articleLd } from '../../data/schema';
+
+// Stubs are only generated in `npm run dev`, never in production builds.
+export async function getStaticPaths() {
+  const articles = await getCollection('articles', (a) => import.meta.env.DEV || !a.data.stub);
+  return articles.map((a) => ({ params: { slug: a.id }, props: { article: a } }));
+}
+const { article } = Astro.props as { article: CollectionEntry<'articles'> };
+const d = article.data;
+const { Content } = await render(article);
+const path = `/learn/${article.id}/`;
+const fmtDate = (dt: Date) => dt.toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base
+  title={d.title}
+  description={d.description}
+  ogType="article"
+  noindex={d.stub}
+  jsonLd={[articleLd({ title: d.title, description: d.description, path, date: d.date, updated: d.updated })]}
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Learn', href: '/learn/' }, { name: d.title, href: path }]}
+>
+  <article>
+    <header class="wrap page-head">
+      <h1>{d.title}</h1>
+      <p class="lede">{d.description}</p>
+      <p class="byline"><time datetime={d.date.toISOString()}>{fmtDate(d.date)}</time>{d.stub && <> · still in draft</>}</p>
+    </header>
+
+    {d.stub && (
+      <section class="wrap stub">
+        <p>This guide is being written. The outline below shows what it will cover.</p>
+      </section>
+    )}
+
+    <section class="wrap prose-wrap">
+      <div class="prose"><Content /></div>
+    </section>
+
+    <section class="section wrap cta">
+      <div class="cta-grid">
+        <div>
+          <h2>Questions about your own home? Send the details and we'll suggest a setup.</h2>
+        </div>
+        <div class="cta-actions">
+          <a class="btn" href="/contact/#quote">Request a quote</a>
+          <a class="btn btn--quiet" href="/learn/">All guides</a>
+        </div>
+      </div>
+    </section>
+  </article>
+</Base>
+<style>
+  .page-head .byline { color: var(--ink-2); font-family: var(--font-sans); font-size: 0.9rem; margin-top: var(--space-4); }
+  .stub { padding-block: var(--space-4); border-left: 2px solid var(--wet); padding-left: var(--space-5); max-width: 60ch; margin-bottom: var(--space-5); }
+  .stub p { margin: 0; color: var(--ink-2); font-family: var(--font-serif); }
+
+  .prose-wrap { padding-block: var(--space-7) var(--space-8); }
+
+  .cta-grid { display: grid; gap: var(--space-5); border-top: 2px solid var(--rule); padding-top: var(--space-6); }
+  @media (min-width: 56rem) { .cta-grid { grid-template-columns: 7fr 5fr; gap: var(--space-8); align-items: end; } }
+  .cta-grid h2 { max-width: 28ch; margin: 0; }
+  .cta-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .cta-grid .eyebrow { margin: 0 0 var(--space-3); }
+</style>

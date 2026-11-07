@@ -1,0 +1,104 @@
+---
+import '@fontsource/bricolage-grotesque/400.css';
+import '@fontsource/bricolage-grotesque/500.css';
+import '@fontsource/bricolage-grotesque/600.css';
+import '@fontsource/source-serif-4/400.css';
+import '@fontsource/source-serif-4/600.css';
+import '@fontsource/source-serif-4/400-italic.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ContactBar from '../components/ContactBar.astro';
+import { site, isPlaceholder } from '../config/site';
+import { organizationLd, breadcrumbLd, type Crumb } from '../data/schema';
+import defaultOg from '../assets/products/utc22-1.jpg';
+
+interface Props {
+  title: string;
+  description: string;
+  crumbs?: Crumb[];
+  jsonLd?: object[];
+  ogImage?: ImageMetadata;
+  ogType?: 'website' | 'article' | 'product';
+  noindex?: boolean;
+  waText?: string;
+}
+
+const { title, description, crumbs = [], jsonLd = [], ogImage, ogType = 'website', noindex = false, waText } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const fullTitle = Astro.url.pathname === '/' ? title : `${title} | erv.sg`;
+const og = await getImage({ src: ogImage ?? defaultOg, width: 1200, format: 'jpg' });
+const ogUrl = new URL(og.src, site.url).href;
+const ld = [organizationLd(), ...(crumbs.length ? [breadcrumbLd(crumbs)] : []), ...jsonLd];
+const gaId = isPlaceholder(site.analytics.ga4Id) ? null : site.analytics.ga4Id;
+const message = waText ?? `Hi, I'm on the erv.sg page "${title}" and would like to ask about it.`;
+---
+<!doctype html>
+<html lang="en-SG">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="alternate" hreflang="en-SG" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#edf1f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1418" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:site_name" content="erv.sg" />
+    <meta property="og:locale" content="en_SG" />
+    <meta property="og:type" content={ogType === 'product' ? 'website' : ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {ld.map((obj) => <script type="application/ld+json" set:html={JSON.stringify(obj)} />)}
+
+    <script is:inline>
+      // Analytics helper used by forms and WhatsApp links. Safe when GA4 is not configured.
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { dataLayer.push(arguments); };
+      window.trackEvent = function (name, params) { try { window.gtag('event', name, params || {}); } catch (e) {} };
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[data-wa]');
+        if (a) window.trackEvent('whatsapp_click', { link_location: a.dataset.wa, page_path: location.pathname });
+      });
+    </script>
+    {gaId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script is:inline define:vars={{ gaId }}>
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      {crumbs.length > 1 && (
+        <nav class="crumbs wrap" aria-label="Breadcrumb">
+          <ol>
+            {crumbs.map((c, i) => (
+              <li>{i === crumbs.length - 1 ? <span aria-current="page">{c.name}</span> : <a href={c.href}>{c.name}</a>}</li>
+            ))}
+          </ol>
+        </nav>
+      )}
+      <slot />
+    </main>
+    <Footer />
+    <ContactBar message={message} />
+  </body>
+</html>

@@ -1,0 +1,334 @@
+---
+// Hero section drawing: a wide architectural section through a condo bedroom.
+// Humid outdoor air (red) enters via an intake, passes through the ERV / fresh-air
+// dehumidifier above the false ceiling, and drops as dry supply air (blue) through
+// a grille into the room. Return air leaves via a ceiling return and goes out.
+// Motion: slow, respects prefers-reduced-motion.
+
+const intake = Array.from({ length: 6 }, (_, i) => i);
+const supply = Array.from({ length: 5 }, (_, i) => i);
+const roomfall = Array.from({ length: 4 }, (_, i) => i);
+const roomReturn = Array.from({ length: 4 }, (_, i) => i);
+const exhaust = Array.from({ length: 4 }, (_, i) => i);
+const vapour = Array.from({ length: 10 }, (_, i) => i);
+---
+<figure class="hero-air">
+ <!-- Mobile: stacked, taller SVG that fits a phone width. Same drafting language, fewer annotations. -->
+ <svg class="hero-air__mobile" viewBox="0 0 360 540" role="img" aria-labelledby="ha-tm ha-dm" preserveAspectRatio="xMidYMid meet">
+   <title id="ha-tm">Section through a condo bedroom, stacked view</title>
+   <desc id="ha-dm">Humid outdoor air enters the ceiling-mounted ERV and fresh-air dehumidifier, then drops as dry supply air through a grille into the room.</desc>
+   <defs>
+     <pattern id="grid5m" width="18" height="18" patternUnits="userSpaceOnUse">
+       <path d="M18 0 H0 V18" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+     </pattern>
+   </defs>
+   <rect x="0" y="0" width="360" height="540" fill="url(#grid5m)" class="grid"/>
+
+   <!-- OUTDOOR band -->
+   <rect x="0" y="0" width="360" height="96" class="zone-out"/>
+   <text x="12" y="22" class="anno big-anno">OUTDOOR</text>
+   <text x="12" y="38" class="anno small-anno">30°C · 85% RH</text>
+   <g class="vapour-m">
+     {Array.from({ length: 10 }, (_, i) => (
+       <circle cx={30 + (i*33)%320} cy={48 + (i*17)%42} r="3" class="d-wet" style={`--i:${i}`} />
+     ))}
+   </g>
+
+   <!-- slab under outdoor -->
+   <rect x="0" y="96" width="360" height="12" class="slab"/>
+
+   <!-- intake pipe into unit -->
+   <rect x="20" y="118" width="80" height="18" class="duct"/>
+   <text x="20" y="112" class="anno small-anno">INTAKE · Ø160</text>
+
+   <!-- UNIT -->
+   <rect x="100" y="156" width="240" height="68" class="unit"/>
+   <text x="112" y="174" class="anno unit-label">ERV + FRESH-AIR DEHU</text>
+   <text x="112" y="190" class="anno small-anno">DBA-UTC22</text>
+   <text x="112" y="206" class="anno small-anno">R290</text>
+   <path d="M196 204 L220 184 L244 204 L220 216 Z" class="core"/>
+   <circle cx="310" cy="198" r="10" class="fan"/>
+
+   <!-- supply duct down -->
+   <rect x="220" y="224" width="30" height="48" class="duct drop"/>
+   <!-- return rise -->
+   <rect x="120" y="224" width="22" height="48" class="duct duct--return drop"/>
+   <!-- exhaust out -->
+   <rect x="20" y="146" width="80" height="18" class="duct duct--return"/>
+   <text x="20" y="140" class="anno small-anno">EXHAUST</text>
+
+   <!-- ceiling line -->
+   <line x1="0" y1="275" x2="360" y2="275" class="ceiling"/>
+   <text x="12" y="294" class="anno small-anno">CEILING VOID / 450</text>
+
+   <!-- supply grille -->
+   <line x1="220" y1="275" x2="250" y2="275" class="grille"/>
+   <line x1="120" y1="275" x2="142" y2="275" class="grille grille--return"/>
+
+   <!-- ROOM -->
+   <rect x="0" y="508" width="360" height="12" class="slab"/>
+   <text x="12" y="316" class="anno big-anno">SUPPLY</text>
+   <text x="12" y="332" class="anno small-anno">24°C · 55% RH</text>
+
+   <!-- bedroom hint -->
+   <path d="M60 508 L60 420 L230 420 L230 508" class="furn"/>
+   <path d="M60 420 L60 400 L120 400 L120 420" class="furn"/>
+   <text x="68" y="440" class="anno small-anno furn-anno">BEDROOM</text>
+
+   <!-- airflow lanes -->
+   <g class="lane-in-m">
+     {Array.from({ length: 5 }, (_, i) => <circle cx="26" cy="127" r="3.6" class="d-wet" style={`--i:${i}`} />)}
+   </g>
+   <g class="lane-drop-m">
+     {Array.from({ length: 5 }, (_, i) => <circle cx="235" cy="232" r="3.6" class="d-dry" style={`--i:${i}`} />)}
+   </g>
+   <g class="lane-ret-m">
+     {Array.from({ length: 4 }, (_, i) => <circle cx="131" cy="265" r="3" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+   </g>
+   <g class="lane-exh-m">
+     {Array.from({ length: 4 }, (_, i) => <circle cx="110" cy="155" r="3" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+   </g>
+
+   <!-- title block -->
+   <line x1="0" y1="524" x2="360" y2="524" class="rule-hard"/>
+   <text x="6" y="536" class="anno tb">SECTION A–A · CONDO BEDROOM</text>
+   <text x="354" y="536" text-anchor="end" class="anno tb">DRG 01</text>
+ </svg>
+
+ <!-- Desktop: the wide annotated drawing -->
+ <div class="scroll-wrap">
+  <svg class="hero-air__wide" viewBox="0 0 1000 440" role="img" aria-labelledby="ha-t ha-d" preserveAspectRatio="xMidYMid meet">
+    <title id="ha-t">Section through a condo bedroom: ERV and fresh-air dehumidifier in the ceiling void</title>
+    <desc id="ha-d">Warm humid outdoor air enters a ducted intake, passes through a filter and dehumidifier concealed above the false ceiling, and is delivered as dry supply air into the room through a ceiling grille. Return air is exhausted back outside.</desc>
+
+    <!-- grid underlay -->
+    <defs>
+      <pattern id="grid5" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M20 0 H0 V20" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.08"/>
+      </pattern>
+      <marker id="arr-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--wet)"/>
+      </marker>
+      <marker id="arr-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--dry)"/>
+      </marker>
+      <marker id="arr-ink" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-2)"/>
+      </marker>
+    </defs>
+
+    <rect x="0" y="0" width="1000" height="440" fill="url(#grid5)" class="grid"/>
+
+    <!-- outdoor zone (left) -->
+    <rect x="0" y="0" width="200" height="440" class="zone-out"/>
+
+    <!-- ambient vapour dots outside -->
+    <g class="vapour">
+      {vapour.map((i) => (
+        <circle cx={25 + (i*17)%160} cy={60 + (i*53)%320} r="2.6" class="d-wet" style={`--i:${i}`} />
+      ))}
+    </g>
+
+    <!-- structure: slab, wall, floor -->
+    <rect x="200" y="0" width="800" height="36" class="slab"/>
+    <text x="206" y="22" class="anno small-anno">SLAB · 150 mm</text>
+
+    <rect x="200" y="404" width="800" height="36" class="slab"/>
+    <text x="206" y="426" class="anno small-anno">FLOOR</text>
+
+    <line x1="200" y1="0" x2="200" y2="440" class="wall"/>
+    <line x1="996" y1="0" x2="996" y2="440" class="wall-thin"/>
+
+    <!-- ceiling plane -->
+    <line x1="200" y1="150" x2="996" y2="150" class="ceiling"/>
+
+    <!-- false ceiling void shading -->
+    <rect x="200" y="36" width="800" height="114" class="void"/>
+
+    <!-- intake penetration through the wall -->
+    <rect x="200" y="56" width="180" height="40" class="duct"/>
+    <text x="210" y="80" class="anno">INTAKE · Ø160</text>
+
+    <!-- unit: fresh-air ERV / dehumidifier -->
+    <rect x="380" y="46" width="240" height="70" class="unit"/>
+    <text x="392" y="66" class="anno unit-label">ERV + FRESH-AIR DEHUMIDIFIER</text>
+    <text x="392" y="82" class="anno small-anno">DBA-UTC22 · R290</text>
+    <!-- coil ticks -->
+    <g class="coil">
+      {[410, 420, 430, 440, 450].map((x) => <line x1={x} y1="52" x2={x} y2="110" />)}
+    </g>
+    <!-- enthalpy core rhombus -->
+    <path d="M480 82 L520 56 L560 82 L520 108 Z" class="core"/>
+    <!-- fan -->
+    <circle cx="595" cy="82" r="14" class="fan"/>
+    <path d="M595 82 L603 76 M595 82 L603 88 M595 82 L587 82" class="fan-blade"/>
+
+    <!-- supply duct -->
+    <rect x="620" y="60" width="200" height="30" class="duct"/>
+    <!-- return duct -->
+    <rect x="620" y="96" width="200" height="22" class="duct duct--return"/>
+    <!-- drops into room -->
+    <rect x="820" y="60" width="30" height="90" class="duct drop"/>
+    <!-- return rise -->
+    <rect x="890" y="96" width="24" height="54" class="duct duct--return drop"/>
+    <!-- exhaust out -->
+    <rect x="820" y="118" width="180" height="22" class="duct duct--return"/>
+    <text x="830" y="134" class="anno small-anno">EXHAUST</text>
+
+    <!-- ceiling grilles -->
+    <line x1="820" y1="150" x2="850" y2="150" class="grille"/>
+    <text x="820" y="168" class="anno small-anno">SUPPLY GRILLE</text>
+    <line x1="890" y1="150" x2="914" y2="150" class="grille grille--return"/>
+    <text x="862" y="176" class="anno small-anno return-anno">RETURN</text>
+
+    <!-- room furniture: bed, nightstand -->
+    <path d="M300 404 L300 340 L620 340 L620 404" class="furn"/>
+    <path d="M300 340 L300 310 L380 310 L380 340" class="furn"/> <!-- headboard -->
+    <path d="M640 404 L640 364 L710 364 L710 404" class="furn"/> <!-- nightstand -->
+    <text x="310" y="356" class="anno small-anno furn-anno">BEDROOM</text>
+
+    <!-- dimension line: ceiling height -->
+    <line x1="260" y1="150" x2="260" y2="404" class="dim"/>
+    <line x1="252" y1="150" x2="268" y2="150" class="dim-tick"/>
+    <line x1="252" y1="404" x2="268" y2="404" class="dim-tick"/>
+    <text x="268" y="280" class="anno dim-label" transform="rotate(-90 268 280)">2600</text>
+
+    <!-- dimension: ceiling void -->
+    <line x1="968" y1="36" x2="968" y2="150" class="dim"/>
+    <line x1="960" y1="36" x2="976" y2="36" class="dim-tick"/>
+    <line x1="960" y1="150" x2="976" y2="150" class="dim-tick"/>
+    <text x="976" y="98" class="anno dim-label" transform="rotate(-90 976 98)">450</text>
+
+    <!-- OUTDOOR label -->
+    <text x="26" y="34" class="anno big-anno">OUTDOOR</text>
+    <text x="26" y="50" class="anno small-anno">30°C · 85% RH</text>
+
+    <!-- SUPPLY air reading inside room -->
+    <text x="640" y="220" class="anno big-anno">SUPPLY</text>
+    <text x="640" y="236" class="anno small-anno">24°C · 55% RH</text>
+
+    <!-- airflow lanes -->
+    <g class="lane-in">
+      {intake.map((i) => <circle cx="210" cy={76} r="4" class="d-wet" style={`--i:${i}`} />)}
+    </g>
+    <g class="lane-sup">
+      {supply.map((i) => <circle cx="628" cy={75} r="4" class="d-dry" style={`--i:${i}`} />)}
+    </g>
+    <g class="lane-drop">
+      {roomfall.map((i) => <circle cx="835" cy="160" r="4" class="d-dry" style={`--i:${i}`} />)}
+    </g>
+    <g class="lane-return">
+      {roomReturn.map((i) => <circle cx="902" cy="160" r="3.4" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+    </g>
+    <g class="lane-exh">
+      {exhaust.map((i) => <circle cx="810" cy="128" r="3.4" class="d-wet d-wet--soft" style={`--i:${i}`} />)}
+    </g>
+
+    <!-- title block (bottom right) -->
+    <g class="titleblock">
+      <line x1="200" y1="400" x2="996" y2="400" class="rule-hard"/>
+      <text x="206" y="396" class="anno tb">SECTION A–A · CEILING-CONCEALED ERV + FRESH-AIR DEHUMIDIFIER</text>
+      <text x="996" y="396" text-anchor="end" class="anno tb">DRG 01 · erv.sg</text>
+    </g>
+  </svg>
+  <span class="scroll-hint">◂ scroll ▸</span>
+ </div>
+</figure>
+
+<style>
+  .hero-air { margin: 0; color: var(--ink); width: 100%; max-width: 100%; min-width: 0; overflow-x: hidden; }
+  /* On narrow phones the annotated drawing is unreadable at page width.
+     Let it sit at a readable minimum width and allow horizontal scroll. */
+  .scroll-wrap { border: 1px solid var(--rule); background: var(--panel); position: relative; }
+  .hero-air__wide { width: 100%; height: auto; display: block; }
+  .hero-air__mobile { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--rule); }
+
+  /* Default (mobile): show the stacked SVG, hide the wide one. */
+  .scroll-wrap { display: none; }
+  .hero-air__mobile { display: block; }
+  @media (min-width: 60rem) {
+    .scroll-wrap { display: block; }
+    .hero-air__mobile { display: none; }
+  }
+  .scroll-hint { display: none; }
+
+  .grid { color: var(--ink); }
+
+  .zone-out {
+    fill: color-mix(in srgb, var(--wet) 9%, var(--panel));
+  }
+  .slab { fill: color-mix(in srgb, var(--rule) 7%, var(--panel)); stroke: var(--rule); stroke-width: 1; }
+  .void { fill: color-mix(in srgb, var(--rule) 3%, var(--panel)); }
+  .wall { stroke: var(--rule); stroke-width: 3; }
+  .wall-thin { stroke: var(--rule); stroke-width: 1.4; }
+  .ceiling { stroke: var(--rule); stroke-width: 1.2; stroke-dasharray: 6 4; }
+  .duct { fill: none; stroke: var(--rule); stroke-width: 1.2; }
+  .duct--return { stroke-dasharray: 5 4; }
+  .drop { }
+  .unit { fill: var(--panel); stroke: var(--rule); stroke-width: 1.8; }
+  .coil line { stroke: var(--dry); stroke-width: 1.4; }
+  .core { fill: none; stroke: var(--rule); stroke-width: 1.4; }
+  .fan { fill: var(--panel); stroke: var(--rule); stroke-width: 1.2; }
+  .fan-blade { fill: none; stroke: var(--rule); stroke-width: 1; }
+  .grille { stroke: var(--rule); stroke-width: 4; stroke-dasharray: 3 2; }
+  .grille--return { stroke-dasharray: 2 3; }
+
+  .furn { fill: none; stroke: var(--ink-2); stroke-width: 1.1; }
+
+  .dim { stroke: var(--ink-2); stroke-width: 0.8; }
+  .dim-tick { stroke: var(--ink-2); stroke-width: 0.8; }
+
+  text.anno {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; fill: var(--ink-2); letter-spacing: 0.04em;
+  }
+  text.big-anno { font-size: 13px; fill: var(--ink); font-weight: 500; letter-spacing: 0.06em; }
+  text.small-anno { font-size: 10px; }
+  text.dim-label { font-size: 10px; fill: var(--ink); background: var(--panel); }
+  text.unit-label { fill: var(--ink); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; }
+  text.return-anno { fill: var(--ink-2); }
+  text.furn-anno { fill: var(--ink-2); font-size: 10px; letter-spacing: 0.08em; }
+  text.tb { font-size: 10px; letter-spacing: 0.08em; fill: var(--ink); }
+
+  .rule-hard { stroke: var(--rule); stroke-width: 1; }
+
+  .d-wet { fill: var(--wet); }
+  .d-wet--soft { opacity: 0.55; }
+  .d-dry { fill: var(--dry); }
+
+  /* Mobile lanes */
+  .vapour-m circle { animation: bob 9s ease-in-out infinite; animation-delay: calc(var(--i) * -0.7s); }
+  .lane-in-m circle { animation: lane-in-m 6s linear infinite; animation-delay: calc(var(--i) * -1.2s); }
+  .lane-drop-m circle { animation: lane-drop-m 6s linear infinite; animation-delay: calc(var(--i) * -1.2s); }
+  .lane-ret-m circle { animation: lane-ret-m 6s ease-out infinite; animation-delay: calc(var(--i) * -1.5s); }
+  .lane-exh-m circle { animation: lane-exh-m 6s linear infinite; animation-delay: calc(var(--i) * -1.5s); }
+  @keyframes lane-in-m { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: .9; } 85% { opacity: .9; } 100% { transform: translateX(80px); opacity: 0; } }
+  @keyframes lane-drop-m { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(170px); opacity: 0; } }
+  @keyframes lane-ret-m { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .55; } 100% { transform: translateY(-80px); opacity: 0; } }
+  @keyframes lane-exh-m { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: .5; } 100% { transform: translateX(-90px); opacity: 0; } }
+
+  .vapour circle { animation: bob 9s ease-in-out infinite; animation-delay: calc(var(--i) * -0.6s); }
+  .lane-in circle { animation: lane-in 6s linear infinite; animation-delay: calc(var(--i) * -1s); }
+  .lane-sup circle { animation: lane-sup 6s linear infinite; animation-delay: calc(var(--i) * -1.2s); }
+  .lane-drop circle { animation: lane-drop 5.5s ease-in infinite; animation-delay: calc(var(--i) * -1.4s); }
+  .lane-return circle { animation: lane-return 6s ease-out infinite; animation-delay: calc(var(--i) * -1.5s); }
+  .lane-exh circle { animation: lane-exh 6s linear infinite; animation-delay: calc(var(--i) * -1.5s); }
+
+  @keyframes bob { 0%,100% { transform: translate(0,0); } 50% { transform: translate(4px,-5px); } }
+  @keyframes lane-in { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: .9; } 85% { opacity: .9; } 100% { transform: translateX(165px); opacity: 0; } }
+  @keyframes lane-sup { 0% { transform: translateX(0); opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { transform: translateX(190px); opacity: 0; } }
+  @keyframes lane-drop { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(170px); opacity: 0; } }
+  @keyframes lane-return { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: .6; } 100% { transform: translateY(-55px); opacity: 0; } }
+  @keyframes lane-exh { 0% { transform: translateX(0); opacity: 0; } 20% { opacity: .5; } 100% { transform: translateX(-180px); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lane-in circle { transform: translateX(calc(var(--i) * 28px)); opacity: .9; }
+    .lane-sup circle { transform: translateX(calc(var(--i) * 38px)); opacity: 1; }
+    .lane-drop circle { transform: translateY(calc(var(--i) * 40px)); opacity: 1; }
+    .lane-return circle, .lane-exh circle { opacity: .5; }
+    .vapour circle, .vapour-m circle { transform: none; }
+    .lane-in-m circle { transform: translateX(calc(var(--i) * 16px)); opacity: .9; }
+    .lane-drop-m circle { transform: translateY(calc(var(--i) * 34px)); opacity: 1; }
+    .lane-ret-m circle, .lane-exh-m circle { opacity: .5; }
+  }
+</style>

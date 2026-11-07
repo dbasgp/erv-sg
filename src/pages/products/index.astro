@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProductRows from '../../components/ProductRows.astro';
+import { families } from '../../data/families';
+import { getProducts } from '../../data/products';
+import { site } from '../../config/site';
+const byFamily = await Promise.all(families.map(async (f) => ({ f, items: await getProducts(f.slug) })));
+---
+<Base
+  title="Products: ceiling dehumidifiers, fresh-air dehumidifiers and ERVs"
+  description="DBA ceiling dehumidifiers, fresh-air ceiling dehumidifiers and energy recovery ventilators for Singapore projects. Specs, datasheets and quotes."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Products', href: '/products/' }]}
+>
+  <header class="wrap page-head">
+    <h1>Products</h1>
+    <p class="lede">Three product families, all designed to sit above a false ceiling. If you are not sure which one you need, start with <a href="/how-it-works/">how they work</a> or just ask us.</p>
+    <p class="small muted">Looking for a portable or off-the-shelf unit? Those are sold at <a href={site.sister.store.url} rel="noopener">{site.sister.store.name}</a>.</p>
+  </header>
+  {byFamily.map(({ f, items }) => (
+    <section class="section wrap">
+      <div class="split">
+        <div>
+          <h2><a href={`/products/${f.slug}/`}>{f.name}</a></h2>
+          <p class="muted">{f.short}</p>
+          <a class="btn btn--quiet" href={`/products/${f.slug}/`}>Compare {f.name.toLowerCase()}</a>
+        </div>
+        <ProductRows products={items} />
+      </div>
+    </section>
+  ))}
+</Base>
+<style>h2 a { color: var(--ink); text-decoration: none; } h2 a:hover { color: var(--accent); text-decoration: underline; }</style>

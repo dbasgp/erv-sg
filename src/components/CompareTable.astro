@@ -1,0 +1,63 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { FamilySlug } from '../data/families';
+import SpecValue from './SpecValue.astro';
+import { compareFields, specLabels, fmt } from '../data/specs';
+interface Props { family: FamilySlug; products: CollectionEntry<'products'>[] }
+const { family, products } = Astro.props;
+const cols = compareFields[family];
+const series = [...new Set(products.map((p) => p.data.series))];
+const tid = `cmp-${family}`;
+---
+<div class="compare" data-compare>
+  {series.length > 1 && (
+    <div class="filter">
+      <label for={`${tid}-series`}>Show series</label>
+      <select id={`${tid}-series`} data-series-filter>
+        <option value="">All series</option>
+        {series.map((s) => <option value={s}>{s}</option>)}
+      </select>
+    </div>
+  )}
+  <div class="table-scroll" tabindex="0" role="region" aria-label={`Comparison table, scroll sideways for more columns`}>
+    <table class="datasheet">
+      <caption class="visually-hidden">Model comparison</caption>
+      <thead>
+        <tr>
+          <th scope="col">Model</th>
+          {cols.map((k) => <th scope="col">{specLabels[k]?.label}{specLabels[k]?.unit && <span class="u"> ({specLabels[k]?.unit})</span>}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {products.map((p) => (
+          <tr data-series={p.data.series}>
+            <th scope="row"><a href={`/products/${family}/${p.data.slug}/`}>{p.data.model}</a></th>
+            {cols.map((k) => <td class="val"><SpecValue value={fmt(p.data, k)} /></td>)}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-compare]').forEach((root) => {
+    const sel = root.querySelector<HTMLSelectElement>('[data-series-filter]');
+    if (!sel) return;
+    sel.addEventListener('change', () => {
+      root.querySelectorAll<HTMLTableRowElement>('tbody tr').forEach((tr) => {
+        tr.hidden = !!sel.value && tr.dataset.series !== sel.value;
+      });
+    });
+  });
+</script>
+
+<style>
+  .filter { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-4); font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--ink-2); letter-spacing: 0.04em; }
+  select { min-height: var(--tap); font: inherit; font-family: var(--font-sans); padding: 0 0.75rem; border: 1px solid var(--rule); border-radius: 0; background: var(--panel); color: var(--ink); }
+  thead .u { font-weight: 400; color: var(--ink-2); font-family: var(--font-mono); font-size: 0.85em; letter-spacing: 0.04em; }
+  tbody th a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 0.25em; font-family: var(--font-mono); }
+  tbody th a:hover { text-decoration-color: var(--wet); }
+  tbody th { font-weight: 500; white-space: nowrap; }
+  .table-scroll { background: transparent; border-color: var(--line); }
+</style>

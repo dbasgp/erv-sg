@@ -1,0 +1,239 @@
+---
+import { getProducts } from '../data/products';
+import { families } from '../data/families';
+import { site } from '../config/site';
+
+interface Props { variant?: 'quote' | 'trade'; id?: string }
+const { variant = 'quote', id = variant } = Astro.props;
+const products = await getProducts();
+const subject = variant === 'trade' ? 'erv.sg trade partner sign-up' : 'erv.sg quote request';
+const f = (name: string) => `${id}-${name}`;
+---
+<form class="enq" data-enquiry={variant} action={site.forms.endpoint} method="POST" enctype="multipart/form-data" novalidate>
+  <input type="hidden" name="access_key" value={site.forms.accessKey} />
+  <input type="hidden" name="subject" value={subject} />
+  <input type="hidden" name="from_name" value="erv.sg website" />
+  <input type="hidden" name="page" value="" data-page />
+  <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+  <div class="grid">
+    <div class="field">
+      <label for={f('name')}>Name</label>
+      <input id={f('name')} name="name" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for={f('company')}>Company {variant === 'quote' && <span class="opt">(optional)</span>}</label>
+      <input id={f('company')} name="company" autocomplete="organization" required={variant === 'trade'} />
+    </div>
+    <div class="field">
+      <label for={f('role')}>{variant === 'trade' ? 'Your trade' : 'I am a'}</label>
+      <select id={f('role')} name="role" required>
+        <option value="">Choose one</option>
+        {variant === 'quote'
+          ? ['Homeowner', 'Interior designer', 'Contractor', 'M&E consultant', 'Facility manager', 'Other'].map((r) => <option>{r}</option>)
+          : ['Contractor', 'Interior designer', 'M&E consultant', 'Developer / builder', 'Other'].map((r) => <option>{r}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for={f('phone')}>Phone</label>
+      <input id={f('phone')} name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
+    </div>
+    <div class="field">
+      <label for={f('email')}>Email</label>
+      <input id={f('email')} name="email" type="email" autocomplete="email" required />
+    </div>
+
+    {variant === 'quote' && (
+      <>
+        <div class="field">
+          <label for={f('property')}>Property type</label>
+          <select id={f('property')} name="property_type">
+            <option value="">Choose one</option>
+            {['Condo', 'HDB', 'Landed home', 'Clinic / healthcare', 'School', 'Lab', 'Hotel', 'Office', 'F&B', 'Wine / cigar / storage', 'Other'].map((r) => <option>{r}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for={f('area')}>Floor area <span class="opt">(m², approx.)</span></label>
+          <input id={f('area')} name="floor_area_m2" type="number" min="0" inputmode="numeric" />
+        </div>
+        <div class="field">
+          <label for={f('rooms')}>Number of rooms to serve</label>
+          <input id={f('rooms')} name="rooms" type="number" min="0" inputmode="numeric" />
+        </div>
+        <div class="field wide">
+          <label for={f('interest')}>Interested in</label>
+          <select id={f('interest')} name="interest" data-interest>
+            <option value="">Not sure yet</option>
+            {families.map((fam) => (
+              <optgroup label={fam.name}>
+                <option value={fam.name}>{fam.name}, any model</option>
+                {products.filter((p) => p.data.family === fam.slug).map((p) => <option value={p.data.model} data-slug={p.data.slug}>{p.data.model}</option>)}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+      </>
+    )}
+
+    {variant === 'trade' && (
+      <div class="field">
+        <label for={f('uen')}>Company UEN <span class="opt">(optional)</span></label>
+        <input id={f('uen')} name="uen" />
+      </div>
+    )}
+
+    <div class="field wide">
+      <label for={f('message')}>{variant === 'trade' ? 'Typical projects you handle' : 'Message'}</label>
+      <textarea id={f('message')} name="message" rows="5"></textarea>
+    </div>
+
+    {variant === 'quote' && (
+      <div class="field wide">
+        <label for={f('plan')}>Floor plan <span class="opt">(optional, PDF or image, up to 5 MB)</span></label>
+        <input id={f('plan')} name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" />
+      </div>
+    )}
+
+    <div class="field wide consent">
+      <input id={f('consent')} name="pdpa_consent" type="checkbox" value="yes" required />
+      <label for={f('consent')}>I agree that DBA Electric Pte. Ltd. may use these details to reply to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</label>
+    </div>
+  </div>
+
+  <div class="submit">
+    <button class="btn" type="submit">{variant === 'trade' ? 'Send sign-up' : 'Send enquiry'}</button>
+    <p class="status" role="status" aria-live="polite" data-status></p>
+  </div>
+</form>
+
+<script>
+  const fileLimit = 5 * 1024 * 1024;
+  document.querySelectorAll<HTMLFormElement>('form[data-enquiry]').forEach((form) => {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const btn = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const page = form.querySelector<HTMLInputElement>('[data-page]');
+    if (page) page.value = location.href;
+
+    // Prefill "Interested in" from ?model=slug or ?family=Name
+    const params = new URLSearchParams(location.search);
+    const sel = form.querySelector<HTMLSelectElement>('[data-interest]');
+    if (sel) {
+      const slug = params.get('model');
+      const fam = params.get('family');
+      const opt = Array.from(sel.options).find((o) => (slug && o.dataset.slug === slug) || (fam && o.value === fam));
+      if (opt) opt.selected = true;
+    }
+
+    const setStatus = (msg: string, kind: 'ok' | 'err' | '') => {
+      status.textContent = msg;
+      status.dataset.kind = kind;
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('', '');
+      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+
+      if (!form.checkValidity()) {
+        const bad = Array.from(form.elements).filter((el): el is HTMLInputElement => 'checkValidity' in el && !(el as HTMLInputElement).checkValidity());
+        bad.forEach((el) => el.setAttribute('aria-invalid', 'true'));
+        bad[0]?.focus();
+        setStatus('Please fill in the highlighted fields.', 'err');
+        return;
+      }
+      const file = form.querySelector<HTMLInputElement>('input[type=file]')?.files?.[0];
+      if (file && file.size > fileLimit) {
+        setStatus('The floor plan is larger than 5 MB. Please send a smaller file, or email it to us instead.', 'err');
+        return;
+      }
+      const key = (form.elements.namedItem('access_key') as HTMLInputElement).value;
+      if (!key) {
+        setStatus('The form is not connected yet. Please contact us by WhatsApp or email for now.', 'err');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || json.success === false) throw new Error(json.message || res.statusText);
+        form.reset();
+        setStatus('Thanks, we have your enquiry. We usually reply within one working day.', 'ok');
+        (window as any).trackEvent?.('generate_lead', { form: form.dataset.enquiry, page_path: location.pathname });
+      } catch (err) {
+        setStatus('Sorry, that did not go through. Please try again, or contact us by WhatsApp or email.', 'err');
+        (window as any).trackEvent?.('form_error', { form: form.dataset.enquiry });
+      } finally {
+        btn.disabled = false;
+        btn.textContent = form.dataset.enquiry === 'trade' ? 'Send sign-up' : 'Send enquiry';
+      }
+    });
+  });
+</script>
+
+<style>
+  .enq { background: transparent; border: 0; padding: 0; }
+  .grid { display: grid; gap: var(--space-5) var(--space-5); }
+  @media (min-width: 40rem) { .grid { grid-template-columns: 1fr 1fr; } .wide { grid-column: 1 / -1; } }
+
+  .field { display: flex; flex-direction: column; gap: var(--space-2); }
+  label {
+    font-family: var(--font-sans); font-weight: 500; font-size: 0.95rem; color: var(--ink);
+    line-height: 1.3;
+  }
+  .opt { font-family: var(--font-sans); font-weight: 400; font-size: 0.85rem; color: var(--ink-2); margin-left: 0.3em; }
+  .opt .unit { font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.02em; }
+
+  input:not([type=checkbox]):not([type=file]), select, textarea {
+    font-family: var(--font-serif); font-size: 1rem; color: var(--ink); background: var(--paper);
+    border: 1px solid var(--line-strong); border-radius: 0;
+    min-height: 52px; padding: 0.75rem 0.9rem; width: 100%;
+    transition: border-color .12s, box-shadow .12s;
+  }
+  select { font-family: var(--font-sans); }
+  input[type=file] {
+    font-family: var(--font-sans); font-size: 0.95rem;
+    padding: 0.75rem; border: 1px dashed var(--line-strong); background: var(--paper); min-height: 52px; width: 100%;
+  }
+  textarea { resize: vertical; min-height: 140px; line-height: 1.5; }
+
+  input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 0; border-color: var(--rule);
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  [aria-invalid='true'] {
+    border-color: var(--wet) !important;
+    box-shadow: inset 0 0 0 1px var(--wet) !important;
+  }
+  [aria-invalid='true'] + .field-err,
+  .field-err { font-family: var(--font-mono); font-size: 0.78rem; color: var(--wet); letter-spacing: 0.02em; }
+
+  .consent { flex-direction: row; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--line); background: var(--panel); }
+  .consent input {
+    width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--rule);
+    appearance: auto;
+  }
+  .consent label { font-weight: 400; font-family: var(--font-serif); font-size: 0.95rem; color: var(--ink-2); }
+  .consent label a { color: var(--ink); }
+
+  .hp { position: absolute; left: -9999px; }
+
+  .submit {
+    margin-top: var(--space-6); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4);
+    padding-top: var(--space-5); border-top: 1px solid var(--line);
+  }
+  .submit .btn { min-width: 10rem; }
+
+  .status {
+    margin: 0; font-family: var(--font-sans); font-size: 0.95rem;
+    padding: 0.5rem 0.9rem;
+  }
+  .status[data-kind='ok'] {
+    color: var(--ink); border-left: 2px solid var(--dry); background: color-mix(in srgb, var(--dry) 7%, transparent);
+  }
+  .status[data-kind='err'] {
+    color: var(--ink); border-left: 2px solid var(--wet); background: color-mix(in srgb, var(--wet) 7%, transparent);
+  }
+  button[disabled] { opacity: .65; cursor: progress; }
+</style>

@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+<Base
+  title="Privacy policy"
+  description="How DBA Electric Pte. Ltd. collects, uses and protects personal data submitted through erv.sg, in line with Singapore's PDPA."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Privacy policy', href: '/privacy/' }]}
+>
+  <header class="wrap page-head">
+    <h1>Privacy policy</h1>
+    <p class="small muted">Last updated: {'{{PRIVACY_UPDATED_DATE}}'}</p>
+  </header>
+  <div class="wrap prose body">
+    <p>This policy explains how {site.company.legalName} (UEN {site.company.uen}) handles personal data collected through erv.sg, in line with Singapore's Personal Data Protection Act 2012 (PDPA).</p>
+    <h2>What we collect</h2>
+    <p>When you send an enquiry or sign up as a trade partner, we collect what you enter: your name, company, role, phone number, email, property details, message and any floor plan you upload. When you message us on WhatsApp, we receive your WhatsApp number and messages.</p>
+    <p>If analytics is enabled, Google Analytics collects anonymous usage data such as pages visited and device type, using cookies.</p>
+    <h2>How we use it</h2>
+    <p>We use your details only to reply to your enquiry, prepare quotations, provide technical support and, for trade partners, manage the trade account. We do not sell your personal data.</p>
+    <h2>Who we share it with</h2>
+    <p>Form submissions pass through our form provider (Web3Forms) to our email. We may share project details with installers working on your project, with your agreement. We may disclose data where the law requires it.</p>
+    <h2>How long we keep it</h2>
+    <p>We keep enquiry records for as long as needed for the purposes above and for our legal and business records, then delete them.</p>
+    <h2>Your rights</h2>
+    <p>You can ask to see or correct the personal data we hold about you, or withdraw your consent to its use. Contact our Data Protection Officer at <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.</p>
+    <h2>Data Protection Officer</h2>
+    <p>{'{{DPO_NAME}}'}, {site.company.legalName}, {site.company.street}, Singapore {site.company.postalCode}. Email: {site.contact.email}</p>
+  </div>
+</Base>
+<style>.body { padding-bottom: var(--space-7); }</style>

@@ -1,0 +1,29 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import SpecValue from './SpecValue.astro';
+import { detailFields, specLabels, fmt } from '../data/specs';
+interface Props { product: CollectionEntry<'products'> }
+const p = Astro.props.product.data;
+const rows = detailFields[p.family];
+---
+<table class="datasheet">
+  <caption class="visually-hidden">{p.model} specifications</caption>
+  <tbody>
+    <tr><th scope="row">Model</th><td class="val">{p.model}</td></tr>
+    <tr><th scope="row">Series</th><td class="val">{p.series}</td></tr>
+    {rows.map((k) => (
+      <tr>
+        <th scope="row">{specLabels[k]?.label}{specLabels[k]?.unit && <span class="visually-hidden"> ({specLabels[k]?.unit})</span>}</th>
+        <td class="val"><SpecValue value={fmt(p, k)} unit={specLabels[k]?.unit} /></td>
+      </tr>
+    ))}
+    <tr>
+      <th scope="row">Certifications</th>
+      <td>{p.certifications.length ? p.certifications.join(', ') : <span class="na">—</span>}</td>
+    </tr>
+  </tbody>
+</table>
+<p class="data-foot label-mono">—  value not yet published; ask for datasheet</p>
+<style>
+  .data-foot { margin-top: var(--space-3); }
+</style>

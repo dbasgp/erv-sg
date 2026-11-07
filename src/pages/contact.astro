@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { site, telHref, waHref, isPlaceholder } from '../config/site';
+---
+<Base
+  title="Contact and request a quote"
+  description="Request a quote or ask about ceiling dehumidifiers, fresh-air dehumidifiers and ERVs in Singapore. WhatsApp, phone, email or send your floor plan."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Contact', href: '/contact/' }]}
+>
+  <header class="wrap page-head">
+    <h1>Get in touch</h1>
+    <p class="lede">Tell us about your space and we'll suggest a setup. A floor plan helps, but it isn't required. WhatsApp is usually the fastest way.</p>
+  </header>
+
+  <!-- Contact rows as a title-block strip, not stacked cards -->
+  <section class="contact-strip" aria-label="Ways to reach us">
+    <div class="wrap strip-row">
+      <div class="cell">
+        <span class="label-mono">WhatsApp</span>
+        <p><a href={waHref("Hi, I'd like to ask about fresh air / dehumidification (erv.sg).")} target="_blank" rel="noopener" data-wa="contact">Chat on WhatsApp</a></p>
+      </div>
+      <div class="cell">
+        <span class="label-mono">Phone</span>
+        <p><a class="data" href={telHref()}>{site.contact.phone}</a></p>
+      </div>
+      <div class="cell">
+        <span class="label-mono">Email</span>
+        <p><a href={`mailto:${site.contact.email}`}>{site.contact.email}</a></p>
+      </div>
+      <div class="cell">
+        <span class="label-mono">Office</span>
+        <p>{site.company.street}<br />Singapore {site.company.postalCode}</p>
+      </div>
+      <div class="cell">
+        <span class="label-mono">Hours</span>
+        <p>{site.contact.hours}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <h2>Where we are</h2>
+    <p class="muted">629 Aljunied Road, Singapore. Visits are by appointment.</p>
+    <div class="map">
+      {isPlaceholder(site.mapEmbedUrl)
+        ? <div class="placeholder map-ph">Map placeholder · {site.company.street}, Singapore</div>
+        : <iframe title={`Map of ${site.company.street}`} src={site.mapEmbedUrl} loading="lazy" referrerpolicy="no-referrer-when-downgrade" width="600" height="400"></iframe>}
+    </div>
+  </section>
+
+  <section class="section wrap" id="quote" aria-labelledby="quote-h">
+    <h2 id="quote-h">Request a quote</h2>
+    <p class="muted">We usually reply within one working day.</p>
+    <div class="form-wrap">
+      <EnquiryForm variant="quote" />
+    </div>
+  </section>
+</Base>
+<style>
+  .contact-strip { border-block: 1px solid var(--line); background: var(--panel); }
+  .strip-row { display: grid; gap: var(--space-4) var(--space-6); padding-block: var(--space-6); grid-template-columns: 1fr; }
+  @media (min-width: 42rem) { .strip-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 72rem) { .strip-row { grid-template-columns: repeat(5, 1fr); } }
+  .cell .label-mono { display: block; margin-bottom: var(--space-1); text-transform: none; letter-spacing: 0; font-family: var(--font-sans); font-size: 0.78rem; font-weight: 500; color: var(--ink-2); }
+  .cell p { margin: 0; font-family: var(--font-serif); color: var(--ink); line-height: 1.4; }
+  .cell a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 0.25em; }
+  .cell a:hover { text-decoration-color: var(--wet); }
+
+  .map { aspect-ratio: 16/7; border: 1px solid var(--rule); overflow: hidden; background: var(--panel); }
+  .map iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .map-ph { aspect-ratio: auto; height: 100%; }
+
+  .form-wrap { max-width: 56rem; }
+</style>

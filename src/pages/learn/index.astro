@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+// Stubs show in `npm run dev` only and are never listed in production.
+const articles = (await getCollection('articles', (a) => import.meta.env.DEV || !a.data.stub))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmtDate = (dt: Date) => dt.toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+<Base
+  title="Learn: guides to fresh air and humidity in Singapore homes"
+  description="Plain guides to indoor air quality in Singapore homes: ERV vs HRV, damp condos, CO₂ in bedrooms and planning a ceiling dehumidifier."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Learn', href: '/learn/' }]}
+>
+  <header class="wrap page-head">
+    <h1>Guides</h1>
+    <p class="lede">Short, plain guides to indoor air quality in Singapore homes. Why a sealed bedroom feels stuffy at 3am, what an ERV does that a fan doesn't, when to plan a ceiling dehumidifier into a renovation.</p>
+  </header>
+
+  <section class="wrap">
+    {articles.length === 0
+      ? <p class="muted empty">The first guides are being written. In the meantime, <a href="/how-it-works/">read how ERVs and dehumidifiers work</a> or <a href="/contact/">ask us directly</a>.</p>
+      : (
+        <ul class="learn-list">
+          {articles.map((a) => (
+            <li>
+              <a href={`/learn/${a.id}/`}>
+                <h2>{a.data.title}</h2>
+                <p>{a.data.description}</p>
+                <p class="meta">
+                  <time datetime={a.data.date.toISOString()}>{fmtDate(a.data.date)}</time>
+                  {a.data.stub && <> · still in draft</>}
+                </p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+  </section>
+</Base>
+<style>
+  .empty { max-width: 56ch; }
+  .learn-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line); }
+  .learn-list > li { border-bottom: 1px solid var(--line); margin: 0; }
+  .learn-list a { display: block; padding: var(--space-5) 0; color: inherit; text-decoration: none; }
+  .learn-list h2 { font-size: var(--fs-h2); margin: 0 0 var(--space-2); }
+  .learn-list p { margin: 0 0 var(--space-2); color: var(--ink-2); font-family: var(--font-serif); max-width: 60ch; }
+  .learn-list .meta { color: var(--ink-2); font-size: 0.85rem; font-family: var(--font-sans); margin: 0; }
+  .learn-list a:hover h2 { text-decoration: underline; text-decoration-color: var(--wet); text-underline-offset: 0.3em; }
+</style>

@@ -1,0 +1,46 @@
+---
+import Base from '../layouts/Base.astro';
+import { faq } from '../data/faq';
+import { faqLd } from '../data/schema';
+const all = faq.flatMap((g) => g.items);
+---
+<Base
+  title="FAQ: installation, maintenance, noise and running cost"
+  description="Answers about installing a ceiling dehumidifier or ERV in Singapore: false ceiling, drain point, ducts, MCST approval, filters, servicing, noise and running cost."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'FAQ', href: '/faq/' }]}
+  jsonLd={[faqLd(all)]}
+>
+  <header class="wrap page-head">
+    <h1>Frequently asked questions</h1>
+    <p class="lede">If your question isn't here, <a href="/contact/">ask us</a> and we'll add it.</p>
+  </header>
+
+  {faq.map((g) => (
+    <section class="section wrap">
+      <h2>{g.title}</h2>
+      <div class="qs">
+        {g.items.map((i) => (
+          <details>
+            <summary><span class="q-text">{i.q}</span></summary>
+            <div class="a"><p>{i.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </section>
+  ))}
+</Base>
+<style>
+  .qs { border-top: 1px solid var(--rule); }
+  details { border-bottom: 1px solid var(--line); }
+  summary {
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: var(--space-4);
+    font-family: var(--font-sans); font-weight: 500; font-size: var(--fs-h3); color: var(--ink);
+    padding: var(--space-4) 0; list-style: none; min-height: 52px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-family: var(--font-mono); font-size: 1.2rem; color: var(--ink-2); flex: none; }
+  details[open] summary::after { content: '–'; color: var(--ink); }
+  summary:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .a { padding: 0 0 var(--space-5); max-width: 60ch; }
+  .a p { margin: 0; color: var(--ink-2); font-family: var(--font-serif); }
+</style>

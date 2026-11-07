@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config/site';
+---
+<Base
+  title="About DBA Electric"
+  description="DBA Electric Pte. Ltd. supplies ceiling dehumidifiers, fresh-air dehumidifiers and ERV systems in Singapore, from its office on Aljunied Road."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'About', href: '/about/' }]}
+>
+  <header class="wrap page-head">
+    <h1>About us</h1>
+    <p class="lede">erv.sg is run by {site.company.legalName}, from an office on Aljunied Road. We supply ceiling dehumidifiers, fresh-air dehumidifiers and ERV systems for homes and buildings in Singapore.</p>
+  </header>
+
+  <section class="section wrap">
+    <div class="split--wide">
+      <div>
+        <h2>What we do</h2>
+      </div>
+      <div>
+        <p>We supply DBA ceiling dehumidifiers, fresh-air ceiling dehumidifiers and energy recovery ventilators, and help owners, designers and contractors choose the right combination for each space.</p>
+        <p>We work with M&amp;E consultants on specifications, with contractors on duct runs and clearances, and with homeowners who want to understand what the installer is putting above the ceiling.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <h2>Company details</h2>
+    <dl class="about-dl">
+      <dt>Operator</dt><dd><strong>{site.company.legalName}</strong></dd>
+      <dt>UEN</dt><dd class="data">{site.company.uen}</dd>
+      <dt>Office</dt><dd>{site.company.street}, Singapore {site.company.postalCode}</dd>
+      <dt>Visits</dt><dd>By appointment — <a href="/contact/">get in touch</a></dd>
+    </dl>
+  </section>
+
+  <section class="section wrap">
+    <h2>Sister sites</h2>
+    <ul class="sites-list">
+      <li>
+        <h3><a href={site.sister.store.url} rel="noopener">{site.sister.store.name}</a></h3>
+        <p>Our Singapore online store for portable dehumidifiers and other off-the-shelf units.</p>
+      </li>
+      <li>
+        <h3><a href={site.sister.hk.url} rel="noopener">{site.sister.hk.name}</a></h3>
+        <p>Our Hong Kong site, same product family, local installers.</p>
+      </li>
+    </ul>
+  </section>
+</Base>
+<style>
+  .about-dl { display: grid; grid-template-columns: 10rem 1fr; gap: var(--space-3) var(--space-5); max-width: 48rem; font-family: var(--font-serif); }
+  .about-dl dt { color: var(--ink-2); }
+  .about-dl dd { margin: 0; color: var(--ink); }
+  .about-dl dd a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); }
+  @media (max-width: 36rem) { .about-dl { grid-template-columns: 1fr; gap: var(--space-1); } .about-dl dt { margin-top: var(--space-3); font-size: 0.85rem; } }
+
+  .sites-list { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-5); }
+  .sites-list li { margin: 0; }
+  .sites-list h3 { font-size: var(--fs-h3); margin: 0 0 var(--space-2); }
+  .sites-list h3 a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 0.3em; }
+  .sites-list h3 a:hover { text-decoration-color: var(--wet); }
+  .sites-list p { margin: 0; color: var(--ink-2); font-family: var(--font-serif); max-width: 60ch; }
+
+  .split--wide { display: grid; gap: var(--space-6); }
+  @media (min-width: 56rem) { .split--wide { grid-template-columns: 5fr 7fr; gap: var(--space-8); } }
+  .split--wide p { font-family: var(--font-serif); max-width: 60ch; }
+</style>

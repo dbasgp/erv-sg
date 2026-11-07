@@ -1,0 +1,129 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { familyBySlug } from '../../data/families';
+import { productImage } from '../../data/images';
+import { Image } from 'astro:assets';
+
+// Drafts are only generated in `npm run dev`, never in production builds.
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', (p) => import.meta.env.DEV || !p.data.draft);
+  return projects.map((p) => ({ params: { slug: p.id }, props: { project: p } }));
+}
+const { project } = Astro.props as { project: CollectionEntry<'projects'> };
+const d = project.data;
+const { Content } = await render(project);
+const path = `/projects/${project.id}/`;
+---
+<Base
+  title={d.title}
+  description={d.description}
+  noindex={d.draft}
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Projects', href: '/projects/' }, { name: d.title, href: path }]}
+>
+  <article>
+    <!-- Case-study header block -->
+    <header class="wrap submittal">
+      <div class="sheet-meta">
+        <span class="label-mono">Project · case study</span>
+        <span class="label-mono">{d.locationType}</span>
+      </div>
+      {d.draft && <p><span class="draft-flag">DRAFT · not built for production</span></p>}
+      <h1>{d.title}</h1>
+      <p class="lede">{d.description}</p>
+    </header>
+
+    <!-- Three-step narrative as columns on desktop, stacked on mobile; with ruled dividers not cards -->
+    <section class="section wrap">
+      <div class="narrative">
+        <div class="col col--prob">
+          <p class="label-mono">Problem</p>
+          <p>{d.problem}</p>
+        </div>
+        <div class="col col--sol">
+          <p class="label-mono">Solution</p>
+          <p>{d.solution}</p>
+        </div>
+        <div class="col col--res">
+          <p class="label-mono">Result</p>
+          <p>{d.result}</p>
+        </div>
+      </div>
+    </section>
+
+    {d.families.length > 0 && (
+      <section class="section wrap">
+        <div class="secthead">
+          <div><p class="eyebrow">Equipment used</p><h2>What went in</h2></div>
+          <span class="ref">spec</span>
+        </div>
+        <ul class="eq-reg">
+          {d.families.map((f, i) => {
+            const fam = familyBySlug(f);
+            if (!fam) return null;
+            return (
+              <li>
+                <span class="num">{String(i+1).padStart(2,'0')}</span>
+                <a href={`/products/${f}/`}>{fam.name}</a>
+                <span class="meta label-mono">family</span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    )}
+
+    {d.photos.length > 0 && (
+      <section class="section wrap">
+        <div class="secthead">
+          <div><p class="eyebrow">Photos</p><h2>On site</h2></div>
+          <span class="ref">PL 01–{String(d.photos.length).padStart(2,'0')}</span>
+        </div>
+        <div class="photos">
+          {d.photos.map((ph, i) => {
+            const img = productImage(ph.src);
+            return img && (
+              <figure>
+                <Image src={img} alt={ph.alt} widths={[400, 800]} sizes="(min-width: 48rem) 50vw, 100vw" />
+                <figcaption><span class="fig">PL {String(i+1).padStart(2,'0')}</span>{ph.alt}</figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    <section class="wrap prose-wrap">
+      <div class="prose"><Content /></div>
+    </section>
+  </article>
+</Base>
+<style>
+  .submittal { padding-block: var(--space-6) var(--space-5); border-bottom: 2px solid var(--rule); }
+  .sheet-meta { display: flex; justify-content: space-between; gap: var(--space-4); border-bottom: 1px solid var(--line); padding-bottom: var(--space-2); margin-bottom: var(--space-5); }
+  .submittal h1 { max-width: 22ch; margin-bottom: var(--space-4); }
+  .submittal .lede { margin-bottom: 0; }
+
+  .narrative { display: grid; gap: var(--space-6); border-top: 2px solid var(--rule); padding-top: var(--space-5); }
+  @media (min-width: 56rem) { .narrative { grid-template-columns: repeat(3, 1fr); gap: 0; } }
+  .col { padding: 0 var(--space-5); }
+  .col:first-child { padding-left: 0; }
+  .col:last-child { padding-right: 0; }
+  @media (min-width: 56rem) { .col + .col { border-left: 1px solid var(--line); } }
+  .col .label-mono { margin-bottom: var(--space-3); color: var(--ink); }
+  .col--prob .label-mono { color: var(--wet); }
+  .col--res .label-mono { color: var(--dry); }
+  .col p:last-child { font-family: var(--font-serif); max-width: 36ch; }
+
+  .eq-reg { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+  .eq-reg li { display: grid; grid-template-columns: 3rem 1fr auto; gap: var(--space-5); padding: var(--space-4) 0; border-bottom: 1px solid var(--line); margin: 0; align-items: baseline; }
+  .eq-reg .num { font-family: var(--font-mono); color: var(--ink-2); font-size: var(--fs-meta); }
+  .eq-reg a { font-family: var(--font-sans); font-weight: 500; font-size: var(--fs-h3); color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 0.3em; }
+  .eq-reg .meta { color: var(--ink-2); }
+
+  .photos { display: grid; gap: var(--space-5); grid-template-columns: 1fr; }
+  @media (min-width: 42rem) { .photos { grid-template-columns: repeat(2, 1fr); } }
+  .photos img { width: 100%; height: auto; aspect-ratio: 4/3; object-fit: cover; background: var(--panel); border: 1px solid var(--line); display: block; }
+
+  .prose-wrap { padding-block: var(--space-6) var(--space-8); }
+</style>

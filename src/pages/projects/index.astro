@@ -1,0 +1,63 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+// Drafts show in `npm run dev` only and are never built for production.
+const projects = (await getCollection('projects', (p) => import.meta.env.DEV || !p.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Base
+  title="Projects: fresh air and dehumidification case studies in Singapore"
+  description="Singapore projects using DBA ceiling dehumidifiers, fresh-air dehumidifiers and ERV systems: the problem, what was installed, and the result."
+  crumbs={[{ name: 'Home', href: '/' }, { name: 'Projects', href: '/projects/' }]}
+>
+  <header class="wrap page-head">
+    <h1>Projects</h1>
+    <p class="lede">Case studies from Singapore installs: what the problem was, what went in, and how it turned out. Shared with the owner's permission.</p>
+  </header>
+
+  <section class="wrap">
+    {projects.length === 0
+      ? <div class="empty">
+          <p class="label-mono">INDEX · EMPTY</p>
+          <p>Case studies are being written up. Meanwhile, <a href="/contact/">ask about a project similar to yours</a> and we'll share what's relevant.</p>
+        </div>
+      : (
+        <ul class="proj-reg">
+          {projects.map((p, i) => (
+            <li>
+              <a href={`/projects/${p.id}/`}>
+                <span class="num">{String(i+1).padStart(2,'0')}</span>
+                <div class="body">
+                  <h2>{p.data.draft && <span class="draft-flag">DRAFT</span>} {p.data.title}</h2>
+                  <p class="desc">{p.data.description}</p>
+                </div>
+                <span class="loc label-mono">{p.data.locationType}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+  </section>
+</Base>
+<style>
+  .empty { border: 1px dashed var(--line-strong); padding: var(--space-6); max-width: 60ch; }
+  .empty .label-mono { margin: 0 0 var(--space-3); }
+  .empty p { margin: 0; }
+
+  .proj-reg { list-style: none; padding: 0; margin: 0; border-top: 2px solid var(--rule); }
+  .proj-reg > li { border-bottom: 1px solid var(--line); margin: 0; }
+  .proj-reg a {
+    display: grid; grid-template-columns: 3rem 1fr 14rem; gap: var(--space-5);
+    padding: var(--space-6) 0; color: inherit; text-decoration: none; align-items: baseline;
+  }
+  .proj-reg .num { font-family: var(--font-mono); color: var(--ink-2); font-size: var(--fs-meta); letter-spacing: 0.05em; }
+  .proj-reg h2 { font-family: var(--font-sans); font-weight: 500; font-size: var(--fs-h2); margin: 0 0 var(--space-2); display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+  .proj-reg .desc { font-family: var(--font-serif); color: var(--ink-2); margin: 0; max-width: 56ch; }
+  .proj-reg .loc { color: var(--ink-2); text-align: right; white-space: nowrap; }
+  .proj-reg a:hover h2 { text-decoration: underline; text-decoration-color: var(--wet); text-underline-offset: 0.3em; }
+
+  @media (max-width: 48rem) {
+    .proj-reg a { grid-template-columns: 2rem 1fr; }
+    .proj-reg .loc { grid-column: 2; text-align: left; margin-top: var(--space-2); }
+  }
+</style>
