@@ -29,5 +29,6 @@ const apps = (await getCollection('applications')).sort((a, b) => a.data.order -
 <style>
   .apps-reg { border-top-color: var(--rule); border-top-width: 2px; }
   .apps-reg a { grid-template-columns: 16rem 1fr; }
+  .apps-reg .meta { font-family: var(--font-serif); font-size: 1rem; letter-spacing: 0; }
   @media (max-width: 42rem) { .apps-reg a { grid-template-columns: 1fr; gap: var(--space-2); } .apps-reg .meta { grid-column: 1; font-family: var(--font-serif); } }
 </style>

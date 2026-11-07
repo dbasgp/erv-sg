@@ -43,7 +43,7 @@ const path = `/applications/${app.id}/`;
         <li>
           <span class="num">{String(i+1).padStart(2,'0')}</span>
           <div>
-            <h3><a href={`/products/${f.slug}/`}>{f.name}</a>{i === 0 && fams.length > 1 && <span class="pri label-mono">main</span>}</h3>
+            <h3><a href={`/products/${f.slug}/`}>{f.name}</a>{i === 0 && fams.length > 1 && <span class="pri">Main choice</span>}</h3>
             <p>{f.short}</p>
           </div>
         </li>
@@ -88,7 +88,7 @@ const path = `/applications/${app.id}/`;
   .fam-reg h3 { font-family: var(--font-sans); font-weight: 500; font-size: var(--fs-h3); margin: 0 0 var(--space-2); display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap; }
   .fam-reg h3 a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 0.3em; }
   .fam-reg h3 a:hover { text-decoration-color: var(--wet); }
-  .fam-reg .pri { color: var(--wet); font-size: var(--fs-meta); letter-spacing: 0.05em; }
+  .fam-reg .pri { color: var(--ink-2); font-family: var(--font-sans); font-size: 0.85rem; font-weight: 500; margin-left: 0.6em; border: 1px solid var(--line-strong); padding: 0.05rem 0.4rem; }
   .fam-reg p { margin: 0; color: var(--ink-2); max-width: 60ch; }
 
   .setup { max-width: 56ch; padding-left: 1.1em; }
