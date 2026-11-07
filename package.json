@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "placeholders": "node scripts/placeholders.mjs"
+    "placeholders": "node scripts/placeholders.mjs",
+    "check:drafts": "node scripts/check-drafts.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

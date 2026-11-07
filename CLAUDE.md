@@ -56,7 +56,7 @@ Core message for the tropics: in Singapore, outdoor air is hot and wet all year.
 ## Enquiry system
 
 - Quote form fields: name, company (optional), role (homeowner / ID / contractor / consultant / facility manager / other), phone, email, property type, floor area (m²), number of rooms, interested family/model, message, file upload for floor plan (optional), PDPA consent checkbox
-- Submit via a serverless-friendly handler (Formspree / Web3Forms / Cloudflare Pages Function — pick one, keep the key in env vars). Show clear success and error states.
+- Submit via a serverless-friendly handler (Web3Forms chosen; key in env vars). Show clear success and error states.
 - Floating WhatsApp button with a prefilled message including the page/model name
 - Track form submits and WhatsApp clicks as GA4 events (measurement ID in config, `{{GA4_ID}}`)
 
@@ -66,7 +66,7 @@ Core message for the tropics: in Singapore, outdoor air is hot and wet all year.
 - Plain CSS with custom properties (or Tailwind if you strongly prefer) — design tokens in one file
 - Images: Astro `<Image>`, WebP/AVIF, lazy-loaded, explicit sizes
 - No heavy JS frameworks; islands only where needed (comparison table filter, form)
-- Deploy target: Cloudflare Pages (include a README with build + deploy steps and how to add a product)
+- Deploy target: **Render static site** (changed from Cloudflare Pages, Nov 2026). README has build + deploy steps and how to add a product. Never push or deploy until the owner says "deploy".
 - Lighthouse targets: 95+ on performance, accessibility, best practices, SEO (mobile)
 
 ## SEO
@@ -96,5 +96,5 @@ Core message for the tropics: in Singapore, outdoor air is hot and wet all year.
 1. Working Astro project, `npm run dev` / `npm run build` clean, no console errors
 2. `src/config/site.ts` holding company details, contacts, GA4 ID, form endpoint
 3. Content folders with sample entries + a `CONTENT_GUIDE.md` showing how I add a model, project, or article
-4. README with deploy steps for Cloudflare Pages and DNS notes for pointing erv.sg
+4. README with deploy steps for Render and DNS notes for pointing erv.sg
 5. A final checklist of every `{{PLACEHOLDER}}` still to fill in

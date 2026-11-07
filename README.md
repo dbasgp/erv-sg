@@ -6,10 +6,11 @@ Static product showcase for DBA Electric Pte. Ltd. (Singapore): ceiling dehumidi
 
 ```bash
 npm install
-npm run dev          # http://localhost:4321  (draft projects are visible here)
-npm run build        # outputs to dist/       (draft projects are excluded)
+npm run dev          # http://localhost:4321  (draft projects and stub articles are visible here)
+npm run build        # outputs to dist/       (draft projects and stub articles are excluded)
 npm run preview      # serve dist/ locally
 npm run placeholders # list every {{PLACEHOLDER}} still to fill in
+npm run check:drafts # after a build: confirm no draft project / stub article is in dist/
 ```
 
 Node 18.20+ (20 or 22 recommended).
@@ -32,7 +33,7 @@ Node 18.20+ (20 or 22 recommended).
 Forms post to [Web3Forms](https://web3forms.com). Create an access key for the receiving mailbox, then set it as an environment variable:
 
 - Local: copy `.env.example` to `.env` and fill in `PUBLIC_WEB3FORMS_KEY`.
-- Cloudflare Pages: Settings → Environment variables → `PUBLIC_WEB3FORMS_KEY` (Production and Preview), then redeploy.
+- Render: service → Environment → add `PUBLIC_WEB3FORMS_KEY`, then trigger a new deploy (the key is baked in at build time).
 
 Web3Forms keys are designed to be used in the browser, so it's fine that this key ends up in the built HTML. Until it's set, the form shows a "not connected yet" message pointing people to WhatsApp/email.
 
@@ -48,27 +49,53 @@ Set `analytics.ga4Id` in `src/config/site.ts`. GA4 only loads once it is set. Ev
 
 Mark `generate_lead` as a key event in GA4.
 
-## Deploy to Cloudflare Pages
+## Deploy to Render (static site)
 
-1. Push this folder to a Git repo (e.g. `dbasgp/erv-sg`).
-2. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git → pick the repo.
-3. Build settings: framework preset **Astro**, build command `npm run build`, output directory `dist`.
-4. Environment variables: `PUBLIC_WEB3FORMS_KEY`, and `NODE_VERSION` = `22`.
-5. Save and deploy. The site appears at `<project>.pages.dev`.
+The site is a plain static build, hosted as a Render **static site**, the same way as our other client sites.
 
-`public/_headers` sets security headers and long-term caching for hashed assets. Cloudflare Pages reads it automatically.
+### First-time setup
+
+1. Push this folder to its own GitHub repo, `dbasgp/erv-sg`.
+2. Render dashboard → New → Static Site → connect `dbasgp/erv-sg`, branch `main`.
+3. Settings:
+   - Build command: `npm ci && npm run build && npm run check:drafts`
+   - Publish directory: `dist`
+   - Environment: `PUBLIC_WEB3FORMS_KEY` (see Enquiry form), `NODE_VERSION` = `22`
+4. Headers: Render ignores `public/_headers`. Add the same headers under the service's Settings → Headers (or apply `render.yaml` as a Blueprint, which already lists them):
+
+   | Path | Header | Value |
+   |---|---|---|
+   | `/*` | `X-Content-Type-Options` | `nosniff` |
+   | `/*` | `Referrer-Policy` | `strict-origin-when-cross-origin` |
+   | `/*` | `X-Frame-Options` | `SAMEORIGIN` |
+   | `/*` | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
+   | `/_astro/*` | `Cache-Control` | `public, max-age=31536000, immutable` |
+
+5. Redirects: Render also ignores `_redirects` files. Any redirect has to be a route rule on the service (dashboard → Redirects/Rewrites, or `POST /v1/services/{id}/routes`). None are needed today.
+
+The build fails if a draft project or stub article ends up in `dist/` (`check:drafts`).
+
+### Deploying a change
+
+Render's GitHub webhook has been unreliable on our other sites, so don't rely on auto-deploy:
+
+```bash
+git push origin main
+curl -X POST https://api.render.com/v1/services/<SERVICE_ID>/deploys \
+  -H "Authorization: Bearer $RENDER_API_KEY" -H "Content-Type: application/json" -d '{}'
+```
+
+Then check the deploy finished in the dashboard (or `GET /v1/services/<SERVICE_ID>/deploys?limit=1`).
 
 ### Pointing erv.sg
 
-1. In the Pages project → Custom domains, add **www.erv.sg** first, then **erv.sg**.
-2. If erv.sg's DNS is on Cloudflare, the records are created for you (`www` CNAME → `<project>.pages.dev`, apex via CNAME flattening).
-3. If DNS is elsewhere, either move the nameservers to Cloudflare (simplest, needed for the apex) or add `CNAME www → <project>.pages.dev` at the current DNS host.
-4. Make www canonical: add a Cloudflare Redirect Rule `erv.sg/*` → `https://www.erv.sg/${1}` (301, preserve query string). Canonicals, sitemap and Open Graph URLs already use `https://www.erv.sg`.
-5. After it's live, submit `https://www.erv.sg/sitemap-index.xml` in Google Search Console.
-
-### Alternative: Render
-
-Our other sites run on Render. To use Render instead, create a static site with build `npm install && npm run build` and publish dir `dist`. Render ignores `_headers`, so set headers and redirects through Render's settings or API.
+1. In the Render service → Settings → Custom Domains, add **www.erv.sg** and **erv.sg**. Render shows the `<service>.onrender.com` target and issues certificates once DNS resolves.
+2. DNS on Cloudflare (recommended, matches our other domains):
+   - `CNAME www → <service>.onrender.com`
+   - `CNAME @ → <service>.onrender.com` (Cloudflare flattens the apex CNAME). Don't use Render's apex A record (`216.24.57.1`); point the apex with a CNAME as above.
+   - Start with the records **DNS only** (grey cloud) until Render shows both domains verified, then proxy them if wanted.
+3. Make www canonical with a Cloudflare Redirect Rule: `erv.sg/*` → `https://www.erv.sg/${1}`, 301, preserve query string. Canonicals, sitemap, robots and Open Graph URLs already use `https://www.erv.sg`.
+4. Once it's live, submit `https://www.erv.sg/sitemap-index.xml` in Google Search Console.
 
 ## Adding a product
 
