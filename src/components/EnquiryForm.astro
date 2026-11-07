@@ -1,116 +1,150 @@
 ---
 import { getProducts } from '../data/products';
 import { families } from '../data/families';
-import { site } from '../config/site';
+import { site, waHref } from '../config/site';
 
 interface Props { variant?: 'quote' | 'trade'; id?: string }
 const { variant = 'quote', id = variant } = Astro.props;
 const products = await getProducts();
 const subject = variant === 'trade' ? 'erv.sg trade partner sign-up' : 'erv.sg quote request';
 const f = (name: string) => `${id}-${name}`;
+const sendLabel = variant === 'trade' ? 'Send sign-up' : 'Send enquiry';
+const sentLabel = variant === 'trade' ? 'Sign-up sent' : 'Enquiry sent';
+const wa = waHref(variant === 'trade'
+  ? "Hi, I'd like to sign up as a trade partner (erv.sg)."
+  : "Hi, I'd like a quote for fresh air / dehumidification (erv.sg).");
 ---
-<form class="enq" data-enquiry={variant} action={site.forms.endpoint} method="POST" enctype="multipart/form-data" novalidate>
+<form class="enq" data-enquiry={variant} data-send={sendLabel} action={site.forms.endpoint} method="POST" enctype="multipart/form-data" novalidate>
   <input type="hidden" name="access_key" value={site.forms.accessKey} />
   <input type="hidden" name="subject" value={subject} />
   <input type="hidden" name="from_name" value="erv.sg website" />
   <input type="hidden" name="page" value="" data-page />
   <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
-  <div class="grid">
-    <div class="field">
-      <label for={f('name')}>Name</label>
-      <input id={f('name')} name="name" autocomplete="name" required />
-    </div>
-    <div class="field">
-      <label for={f('company')}>Company {variant === 'quote' && <span class="opt">(optional)</span>}</label>
-      <input id={f('company')} name="company" autocomplete="organization" required={variant === 'trade'} />
-    </div>
-    <div class="field">
-      <label for={f('role')}>{variant === 'trade' ? 'Your trade' : 'I am a'}</label>
-      <select id={f('role')} name="role" required>
-        <option value="">Choose one</option>
-        {variant === 'quote'
-          ? ['Homeowner', 'Interior designer', 'Contractor', 'M&E consultant', 'Facility manager', 'Other'].map((r) => <option>{r}</option>)
-          : ['Contractor', 'Interior designer', 'M&E consultant', 'Developer / builder', 'Other'].map((r) => <option>{r}</option>)}
-      </select>
-    </div>
-    <div class="field">
-      <label for={f('phone')}>Phone</label>
-      <input id={f('phone')} name="phone" type="tel" autocomplete="tel" inputmode="tel" required />
-    </div>
-    <div class="field">
-      <label for={f('email')}>Email</label>
-      <input id={f('email')} name="email" type="email" autocomplete="email" required />
-    </div>
+  <div class="fields" data-fields>
+    <p class="req-note">All fields are required unless marked optional.</p>
 
-    {variant === 'quote' && (
-      <>
-        <div class="field">
-          <label for={f('property')}>Property type</label>
-          <select id={f('property')} name="property_type">
-            <option value="">Choose one</option>
-            {['Condo', 'HDB', 'Landed home', 'Clinic / healthcare', 'School', 'Lab', 'Hotel', 'Office', 'F&B', 'Wine / cigar / storage', 'Other'].map((r) => <option>{r}</option>)}
-          </select>
-        </div>
-        <div class="field">
-          <label for={f('area')}>Floor area <span class="opt">(m², approx.)</span></label>
-          <input id={f('area')} name="floor_area_m2" type="number" min="0" inputmode="numeric" />
-        </div>
-        <div class="field">
-          <label for={f('rooms')}>Number of rooms to serve</label>
-          <input id={f('rooms')} name="rooms" type="number" min="0" inputmode="numeric" />
-        </div>
-        <div class="field wide">
-          <label for={f('interest')}>Interested in</label>
-          <select id={f('interest')} name="interest" data-interest>
-            <option value="">Not sure yet</option>
-            {families.map((fam) => (
-              <optgroup label={fam.name}>
-                <option value={fam.name}>{fam.name}, any model</option>
-                {products.filter((p) => p.data.family === fam.slug).map((p) => <option value={p.data.model} data-slug={p.data.slug}>{p.data.model}</option>)}
-              </optgroup>
-            ))}
-          </select>
-        </div>
-      </>
-    )}
-
-    {variant === 'trade' && (
+    <div class="grid">
       <div class="field">
-        <label for={f('uen')}>Company UEN <span class="opt">(optional)</span></label>
-        <input id={f('uen')} name="uen" />
+        <label for={f('name')}>Name</label>
+        <input id={f('name')} name="name" autocomplete="name" required data-err="Enter your name." />
       </div>
-    )}
+      <div class="field">
+        <label for={f('company')}>Company{variant === 'quote' && <span class="opt">optional</span>}</label>
+        <input id={f('company')} name="company" autocomplete="organization" required={variant === 'trade'} data-err="Enter your company name." />
+      </div>
+      <div class="field">
+        <label for={f('role')}>{variant === 'trade' ? 'Your trade' : 'I am a'}</label>
+        <select id={f('role')} name="role" required data-err="Choose the option that fits you best.">
+          <option value="">Choose one</option>
+          {variant === 'quote'
+            ? ['Homeowner', 'Interior designer', 'Contractor', 'M&E consultant', 'Facility manager', 'Other'].map((r) => <option>{r}</option>)
+            : ['Contractor', 'Interior designer', 'M&E consultant', 'Developer / builder', 'Other'].map((r) => <option>{r}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for={f('phone')}>Phone</label>
+        <input id={f('phone')} name="phone" type="tel" autocomplete="tel" inputmode="tel" required data-err="Enter a phone number we can call or WhatsApp." />
+      </div>
+      <div class="field">
+        <label for={f('email')}>Email</label>
+        <input id={f('email')} name="email" type="email" autocomplete="email" required data-err="Enter an email address, like name@example.com." />
+      </div>
 
-    <div class="field wide">
-      <label for={f('message')}>{variant === 'trade' ? 'Typical projects you handle' : 'Message'}</label>
-      <textarea id={f('message')} name="message" rows="5"></textarea>
+      {variant === 'quote' && (
+        <>
+          <div class="field">
+            <label for={f('property')}>Property type<span class="opt">optional</span></label>
+            <select id={f('property')} name="property_type">
+              <option value="">Choose one</option>
+              {['Condo', 'HDB', 'Landed home', 'Clinic / healthcare', 'School', 'Lab', 'Hotel', 'Office', 'F&B', 'Wine / cigar / storage', 'Other'].map((r) => <option>{r}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label for={f('area')}>Floor area<span class="opt">optional</span></label>
+            <div class="with-unit">
+              <input id={f('area')} name="floor_area_m2" type="number" min="0" inputmode="numeric" aria-describedby={f('area-hint')} data-err="Enter a number, or leave it blank." />
+              <span class="unit" aria-hidden="true">m²</span>
+            </div>
+            <p class="hint" id={f('area-hint')}>A rough figure is fine.</p>
+          </div>
+          <div class="field">
+            <label for={f('rooms')}>Rooms to serve<span class="opt">optional</span></label>
+            <input id={f('rooms')} name="rooms" type="number" min="0" inputmode="numeric" data-err="Enter a number, or leave it blank." />
+          </div>
+          <div class="field">
+            <label for={f('interest')}>Interested in<span class="opt">optional</span></label>
+            <select id={f('interest')} name="interest" data-interest>
+              <option value="">Not sure yet</option>
+              {families.map((fam) => (
+                <optgroup label={fam.name}>
+                  <option value={fam.name}>{fam.name}, any model</option>
+                  {products.filter((p) => p.data.family === fam.slug).map((p) => <option value={p.data.model} data-slug={p.data.slug}>{p.data.model}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
+
+      {variant === 'trade' && (
+        <div class="field">
+          <label for={f('uen')}>Company UEN<span class="opt">optional</span></label>
+          <input id={f('uen')} name="uen" />
+        </div>
+      )}
+
+      <div class="field wide">
+        <label for={f('message')}>{variant === 'trade' ? 'Typical projects you handle' : 'Tell us about the space'}<span class="opt">optional</span></label>
+        <textarea id={f('message')} name="message" rows="5"></textarea>
+      </div>
+
+      {variant === 'quote' && (
+        <div class="field wide">
+          <label for={f('plan')}>Floor plan<span class="opt">optional</span></label>
+          <input id={f('plan')} name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" aria-describedby={f('plan-hint')} />
+          <p class="hint" id={f('plan-hint')}>PDF or image, up to <span class="unit">5 MB</span>.</p>
+        </div>
+      )}
+
+      <div class="field wide">
+        <div class="consent">
+          <input id={f('consent')} name="pdpa_consent" type="checkbox" value="yes" required data-err="Tick the box so we can use your details to reply." />
+          <label for={f('consent')}>I agree that DBA Electric Pte. Ltd. may use these details to reply to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</label>
+        </div>
+      </div>
     </div>
 
-    {variant === 'quote' && (
-      <div class="field wide">
-        <label for={f('plan')}>Floor plan <span class="opt">(optional, PDF or image, up to 5 MB)</span></label>
-        <input id={f('plan')} name="attachment" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" />
+    <div class="submit">
+      <button class="btn" type="submit">{sendLabel}</button>
+      <div class="status" role="alert" data-status hidden>
+        <p class="status-title" data-status-title></p>
+        <p class="status-body" data-status-body></p>
+        <p class="status-alt" data-status-alt hidden><a href={wa} target="_blank" rel="noopener" data-wa="form-fallback">Message us on WhatsApp</a> or <a href={`mailto:${site.contact.email}`}>email us</a> instead.</p>
       </div>
-    )}
-
-    <div class="field wide consent">
-      <input id={f('consent')} name="pdpa_consent" type="checkbox" value="yes" required />
-      <label for={f('consent')}>I agree that DBA Electric Pte. Ltd. may use these details to reply to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</label>
     </div>
   </div>
 
-  <div class="submit">
-    <button class="btn" type="submit">{variant === 'trade' ? 'Send sign-up' : 'Send enquiry'}</button>
-    <p class="status" role="status" aria-live="polite" data-status></p>
+  <div class="done" data-done hidden tabindex="-1">
+    <p class="done-title">{sentLabel}</p>
+    <p>Thanks. We usually reply within one working day, by phone, WhatsApp or email.</p>
+    <button class="btn btn--quiet" type="button" data-again>{variant === 'trade' ? 'Send another sign-up' : 'Send another enquiry'}</button>
   </div>
 </form>
 
 <script>
   const fileLimit = 5 * 1024 * 1024;
+  type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
   document.querySelectorAll<HTMLFormElement>('form[data-enquiry]').forEach((form) => {
+    const fieldsWrap = form.querySelector<HTMLElement>('[data-fields]')!;
+    const done = form.querySelector<HTMLElement>('[data-done]')!;
     const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const statusTitle = form.querySelector<HTMLElement>('[data-status-title]')!;
+    const statusBody = form.querySelector<HTMLElement>('[data-status-body]')!;
+    const statusAlt = form.querySelector<HTMLElement>('[data-status-alt]')!;
     const btn = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    const sendLabel = form.dataset.send ?? 'Send';
     const page = form.querySelector<HTMLInputElement>('[data-page]');
     if (page) page.value = location.href;
 
@@ -124,31 +158,83 @@ const f = (name: string) => `${id}-${name}`;
       if (opt) opt.selected = true;
     }
 
-    const setStatus = (msg: string, kind: 'ok' | 'err' | '') => {
-      status.textContent = msg;
-      status.dataset.kind = kind;
+    const showStatus = (title: string, body: string, alt = false) => {
+      statusTitle.textContent = title;
+      statusBody.textContent = body;
+      statusAlt.hidden = !alt;
+      status.hidden = false;
     };
+    const clearStatus = () => { status.hidden = true; };
+
+    // Per-field error messages, linked with aria-describedby.
+    const errFor = (el: Field) => {
+      const box = el.closest('.field')!;
+      let msg = box.querySelector<HTMLElement>('.field-err');
+      if (!msg) {
+        msg = document.createElement('p');
+        msg.className = 'field-err';
+        msg.id = `${el.id}-err`;
+        box.appendChild(msg);
+      }
+      return msg;
+    };
+    const setError = (el: Field, text: string) => {
+      const msg = errFor(el);
+      msg.textContent = text;
+      el.setAttribute('aria-invalid', 'true');
+      const ids = new Set((el.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean));
+      ids.add(msg.id);
+      el.setAttribute('aria-describedby', [...ids].join(' '));
+    };
+    const clearError = (el: Field) => {
+      el.removeAttribute('aria-invalid');
+      const msg = el.closest('.field')?.querySelector('.field-err');
+      if (msg) {
+        const ids = (el.getAttribute('aria-describedby') ?? '').split(' ').filter((i) => i && i !== msg.id);
+        ids.length ? el.setAttribute('aria-describedby', ids.join(' ')) : el.removeAttribute('aria-describedby');
+        msg.remove();
+      }
+    };
+    const fields = () => Array.from(form.querySelectorAll<Field>('.field input, .field select, .field textarea'));
+
+    // Re-check a field once the person fixes it.
+    fields().forEach((el) => {
+      const evt = el instanceof HTMLSelectElement || (el as HTMLInputElement).type === 'checkbox' ? 'change' : 'input';
+      el.addEventListener(evt, () => { if (el.getAttribute('aria-invalid') && el.checkValidity()) clearError(el); });
+    });
+
+    form.querySelector('[data-again]')?.addEventListener('click', () => {
+      done.hidden = true;
+      fieldsWrap.hidden = false;
+      clearStatus();
+      form.querySelector<HTMLElement>('.field input, .field select')?.focus();
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      setStatus('', '');
-      form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+      clearStatus();
+      fields().forEach(clearError);
 
-      if (!form.checkValidity()) {
-        const bad = Array.from(form.elements).filter((el): el is HTMLInputElement => 'checkValidity' in el && !(el as HTMLInputElement).checkValidity());
-        bad.forEach((el) => el.setAttribute('aria-invalid', 'true'));
-        bad[0]?.focus();
-        setStatus('Please fill in the highlighted fields.', 'err');
+      const bad = fields().filter((el) => !el.checkValidity());
+      const fileInput = form.querySelector<HTMLInputElement>('input[type=file]');
+      const file = fileInput?.files?.[0];
+      if (fileInput && file && file.size > fileLimit) bad.push(fileInput);
+
+      if (bad.length) {
+        bad.forEach((el) => setError(el, el === fileInput && file && file.size > fileLimit
+          ? 'This file is larger than 5 MB. Choose a smaller file, or email it to us.'
+          : el.dataset.err ?? 'Fill in this field.'));
+        showStatus(
+          bad.length === 1 ? '1 field needs attention' : `${bad.length} fields need attention`,
+          'Check the fields marked below, then send again.',
+        );
+        bad[0].focus();
         return;
       }
-      const file = form.querySelector<HTMLInputElement>('input[type=file]')?.files?.[0];
-      if (file && file.size > fileLimit) {
-        setStatus('The floor plan is larger than 5 MB. Please send a smaller file, or email it to us instead.', 'err');
-        return;
-      }
+
       const key = (form.elements.namedItem('access_key') as HTMLInputElement).value;
       if (!key) {
-        setStatus('The form is not connected yet. Please contact us by WhatsApp or email for now.', 'err');
+        showStatus('The form isn’t connected yet', 'Your details were not sent. Please contact us directly for now.', true);
         return;
       }
 
@@ -159,81 +245,120 @@ const f = (name: string) => `${id}-${name}`;
         const json = await res.json().catch(() => ({}));
         if (!res.ok || json.success === false) throw new Error(json.message || res.statusText);
         form.reset();
-        setStatus('Thanks, we have your enquiry. We usually reply within one working day.', 'ok');
+        fieldsWrap.hidden = true;
+        done.hidden = false;
+        done.focus();
         (window as any).trackEvent?.('generate_lead', { form: form.dataset.enquiry, page_path: location.pathname });
-      } catch (err) {
-        setStatus('Sorry, that did not go through. Please try again, or contact us by WhatsApp or email.', 'err');
+      } catch {
+        showStatus('Your enquiry wasn’t sent', 'Check your connection and try again. Your answers are still filled in.', true);
         (window as any).trackEvent?.('form_error', { form: form.dataset.enquiry });
       } finally {
         btn.disabled = false;
-        btn.textContent = form.dataset.enquiry === 'trade' ? 'Send sign-up' : 'Send enquiry';
+        btn.textContent = sendLabel;
       }
     });
   });
 </script>
 
 <style>
-  .enq { background: transparent; border: 0; padding: 0; }
-  .grid { display: grid; gap: var(--space-5) var(--space-5); }
+  .enq { max-width: 44rem; }
+  .req-note { margin: 0 0 var(--space-5); font-family: var(--font-sans); font-size: 0.9rem; color: var(--ink-2); }
+
+  .grid { display: grid; gap: var(--space-5); }
   @media (min-width: 40rem) { .grid { grid-template-columns: 1fr 1fr; } .wide { grid-column: 1 / -1; } }
 
-  .field { display: flex; flex-direction: column; gap: var(--space-2); }
+  .field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
   label {
-    font-family: var(--font-sans); font-weight: 500; font-size: 0.95rem; color: var(--ink);
-    line-height: 1.3;
+    font-family: var(--font-sans); font-weight: 600; font-size: 1rem; color: var(--ink); line-height: 1.3;
   }
-  .opt { font-family: var(--font-sans); font-weight: 400; font-size: 0.85rem; color: var(--ink-2); margin-left: 0.3em; }
-  .opt .unit { font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.02em; }
+  .opt { font-weight: 400; font-size: 0.875rem; color: var(--ink-2); margin-left: 0.5em; }
+  .hint { margin: 0; font-family: var(--font-sans); font-size: 0.875rem; color: var(--ink-2); line-height: 1.4; }
+  .unit { font-family: var(--font-mono); font-size: 0.85em; }
 
   input:not([type=checkbox]):not([type=file]), select, textarea {
-    font-family: var(--font-serif); font-size: 1rem; color: var(--ink); background: var(--paper);
+    appearance: none; -webkit-appearance: none;
+    font-family: var(--font-sans); font-size: 1rem; color: var(--ink);
+    background-color: var(--panel);
     border: 1px solid var(--line-strong); border-radius: 0;
     min-height: 52px; padding: 0.75rem 0.9rem; width: 100%;
-    transition: border-color .12s, box-shadow .12s;
   }
-  select { font-family: var(--font-sans); }
-  input[type=file] {
-    font-family: var(--font-sans); font-size: 0.95rem;
-    padding: 0.75rem; border: 1px dashed var(--line-strong); background: var(--paper); min-height: 52px; width: 100%;
-  }
+  input:hover:not([type=checkbox]):not([type=file]), select:hover, textarea:hover { border-color: var(--rule); }
   textarea { resize: vertical; min-height: 140px; line-height: 1.5; }
 
-  input:focus-visible, select:focus-visible, textarea:focus-visible {
-    outline: 0; border-color: var(--rule);
-    box-shadow: inset 0 0 0 1px var(--rule);
+  /* Square chevron drawn with two gradients so it follows the theme colours. */
+  select {
+    padding-right: 2.75rem; cursor: pointer;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+      linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position: calc(100% - 1.25rem) 50%, calc(100% - 0.9rem) 50%;
+    background-size: 0.36rem 0.36rem, 0.36rem 0.36rem;
+    background-repeat: no-repeat;
   }
-  [aria-invalid='true'] {
-    border-color: var(--wet) !important;
-    box-shadow: inset 0 0 0 1px var(--wet) !important;
-  }
-  [aria-invalid='true'] + .field-err,
-  .field-err { font-family: var(--font-mono); font-size: 0.78rem; color: var(--wet); letter-spacing: 0.02em; }
 
-  .consent { flex-direction: row; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--line); background: var(--panel); }
-  .consent input {
-    width: 22px; height: 22px; margin-top: 2px; flex: none; accent-color: var(--rule);
-    appearance: auto;
+  .with-unit { position: relative; }
+  .with-unit input { padding-right: 3rem; }
+  .with-unit .unit { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--ink-2); pointer-events: none; }
+
+  input[type=file] {
+    font-family: var(--font-sans); font-size: 0.95rem; color: var(--ink-2);
+    width: 100%; min-height: 52px; padding: 0.4rem; border: 1px dashed var(--line-strong); background: var(--panel);
   }
-  .consent label { font-weight: 400; font-family: var(--font-serif); font-size: 0.95rem; color: var(--ink-2); }
+  input[type=file]::file-selector-button {
+    font: 500 0.95rem var(--font-sans); color: var(--ink);
+    min-height: var(--tap); padding: 0 1rem; margin-right: 0.9rem;
+    background: transparent; border: 1px solid var(--rule); border-radius: 0; cursor: pointer;
+  }
+  input[type=file]::file-selector-button:hover { background: var(--rule); color: var(--paper); }
+
+  /* Focus: a clear 2px ring outside the field, plus a darker border. */
+  input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--focus); outline-offset: 2px; border-color: var(--rule);
+  }
+
+  /* Errors: thicker border + message under the field. Colour is never the only signal. */
+  .field :global([aria-invalid='true']) { border-color: var(--wet); box-shadow: inset 3px 0 0 var(--wet); }
+  .field :global(.field-err) {
+    margin: 0; font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500; color: var(--wet); line-height: 1.4;
+  }
+  .field :global(.field-err)::before { content: '! '; font-weight: 700; }
+
+  /* Consent: the whole row is the tap target. */
+  .consent {
+    display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); align-items: start;
+    padding: var(--space-4); border: 1px solid var(--line-strong); background: var(--panel);
+  }
+  .consent input { width: 24px; height: 24px; margin: 0; accent-color: var(--rule); cursor: pointer; }
+  .consent label { font-weight: 400; font-family: var(--font-serif); font-size: 0.95rem; color: var(--ink); line-height: 1.5; cursor: pointer; }
   .consent label a { color: var(--ink); }
+  .consent:has([aria-invalid='true']) { border-color: var(--wet); box-shadow: inset 3px 0 0 var(--wet); }
 
   .hp { position: absolute; left: -9999px; }
 
   .submit {
-    margin-top: var(--space-6); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4);
-    padding-top: var(--space-5); border-top: 1px solid var(--line);
+    margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--line);
+    display: grid; gap: var(--space-4); justify-items: start;
   }
-  .submit .btn { min-width: 10rem; }
+  .submit .btn { min-width: 12rem; min-height: 52px; font-size: 1rem; }
+  @media (max-width: 40rem) { .submit .btn { width: 100%; } }
+  button[disabled] { opacity: .65; cursor: progress; }
 
   .status {
-    margin: 0; font-family: var(--font-sans); font-size: 0.95rem;
-    padding: 0.5rem 0.9rem;
+    width: 100%; padding: var(--space-4); border: 1px solid var(--wet); border-left-width: 4px; background: var(--panel);
   }
-  .status[data-kind='ok'] {
-    color: var(--ink); border-left: 2px solid var(--dry); background: color-mix(in srgb, var(--dry) 7%, transparent);
+  .status-title { margin: 0 0 var(--space-1); font-family: var(--font-sans); font-weight: 600; color: var(--ink); }
+  .status-body, .status-alt { margin: 0; font-family: var(--font-serif); color: var(--ink); font-size: 0.95rem; }
+  .status-alt { margin-top: var(--space-2); }
+  .status a { color: var(--ink); }
+
+  .done {
+    padding: var(--space-6); border: 1px solid var(--rule); border-left-width: 4px; background: var(--panel);
   }
-  .status[data-kind='err'] {
-    color: var(--ink); border-left: 2px solid var(--wet); background: color-mix(in srgb, var(--wet) 7%, transparent);
-  }
-  button[disabled] { opacity: .65; cursor: progress; }
+  .done:focus { outline: none; }
+  .done:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .done .done-title { margin: 0 0 var(--space-2); font-family: var(--font-sans); font-weight: 600; font-size: var(--fs-h3, 1.25rem); color: var(--ink); }
+  .done p { font-family: var(--font-serif); color: var(--ink); max-width: 48ch; }
+  .done .btn { margin-top: var(--space-3); }
+
+  [hidden] { display: none !important; }
 </style>
