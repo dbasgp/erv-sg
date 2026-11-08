@@ -55,7 +55,7 @@ The site is a plain static build, hosted as a Render **static site**, the same w
 
 ### First-time setup
 
-1. Push this folder to its own GitHub repo, `dbasgp/erv-sg`.
+1. Repo: `dbasgp/erv-sg` (public). Render service: `erv-sg`, `srv-dbo8c9bm8hqs73frdgrg`, live at https://erv-sg.onrender.com. Steps below are for reference if it ever needs recreating.
 2. Render dashboard → New → Static Site → connect `dbasgp/erv-sg`, branch `main`.
 3. Settings:
    - Build command: `npm ci && npm run build && npm run check:drafts`
@@ -81,11 +81,11 @@ Render's GitHub webhook has been unreliable on our other sites, so don't rely on
 
 ```bash
 git push origin main
-curl -X POST https://api.render.com/v1/services/<SERVICE_ID>/deploys \
+curl -X POST https://api.render.com/v1/services/srv-dbo8c9bm8hqs73frdgrg/deploys \
   -H "Authorization: Bearer $RENDER_API_KEY" -H "Content-Type: application/json" -d '{}'
 ```
 
-Then check the deploy finished in the dashboard (or `GET /v1/services/<SERVICE_ID>/deploys?limit=1`).
+Then check the deploy finished in the dashboard (or `GET /v1/services/srv-dbo8c9bm8hqs73frdgrg/deploys?limit=1`).
 
 ### Pointing erv.sg
 
